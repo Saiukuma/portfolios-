@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bo Senghour — Data Science &amp; Engineering Chronicle</title>
+    <link rel="canonical" href="https://saiukuma.github.io/portfolios-/dexter.html">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Classic Roman & Broadsheet Newspaper Typography -->
@@ -12,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -30,22 +33,22 @@
 
     <style>
         /* =====================================================================
-           1. THEME VARIABLES (ALABASTER WHITE & MATTE OBSIDIAN BLACK)
+           1. THEME VARIABLES (WARM PARCHMENT & MATTE OBSIDIAN BLACK)
            ===================================================================== */
         :root,
         [data-theme="light"] {
-            --bg-primary: #FAF9F6;
-            --bg-solid: #FAF9F6;
-            --bg-surface: rgba(255, 255, 255, 0.86);
-            --text-primary: #18181B;
-            --text-secondary: #3F3F46;
-            --text-muted: #71717A;
-            --accent-gold: #B49252;
-            --gold-highlight-bg: rgba(180, 146, 82, 0.2);
-            --border-hairline: rgba(24, 24, 27, 0.14);
-            --border-subtle: rgba(24, 24, 27, 0.1);
-            --watermark-color: rgba(180, 146, 82, 0.085);
-            --cutout-shadow: rgba(24, 24, 27, 0.24);
+            --bg-primary: #F0E7D1;
+            --bg-solid: #F5EFE1;
+            --bg-surface: rgba(248, 243, 229, 0.9);
+            --text-primary: #211D16;
+            --text-secondary: #463F33;
+            --text-muted: #716852;
+            --accent-gold: #9C7840;
+            --gold-highlight-bg: rgba(156, 120, 64, 0.2);
+            --border-hairline: rgba(58, 47, 29, 0.16);
+            --border-subtle: rgba(58, 47, 29, 0.11);
+            --watermark-color: rgba(140, 106, 52, 0.09);
+            --cutout-shadow: rgba(45, 34, 17, 0.24);
             --gentle-ease: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -69,12 +72,35 @@
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
-            overflow: hidden !important;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto !important;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
             background-color: var(--bg-primary);
             color: var(--text-primary);
             font-family: 'Newsreader', Georgia, serif;
-            transition: background-color 0.85s var(--gentle-ease), color 0.85s var(--gentle-ease);
+            transition: color 0.85s var(--gentle-ease);
+        }
+
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 700ms;
+            animation-timing-function: var(--gentle-ease);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            ::view-transition-old(root),
+            ::view-transition-new(root) {
+                animation-duration: 1ms;
+            }
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
         }
 
         .gold-text {
@@ -142,46 +168,96 @@
             z-index: 1;
             pointer-events: none;
             background: radial-gradient(circle at center, transparent 42%, var(--bg-primary) 100%);
-            transition: background 0.85s var(--gentle-ease);
+        }
+
+        html:not(.dark) .paper-vignette {
+            background:
+                radial-gradient(ellipse at 18% 18%, rgba(182, 146, 76, 0.07), transparent 44%),
+                radial-gradient(ellipse at 82% 78%, rgba(153, 112, 42, 0.05), transparent 42%),
+                radial-gradient(circle at center, transparent 42%, var(--bg-primary) 100%);
+        }
+
+        html:not(.dark) .paper-vignette::after {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(rgba(93, 71, 35, 0.11) 0.35px, transparent 0.65px),
+                radial-gradient(rgba(255, 255, 255, 0.3) 0.45px, transparent 0.75px);
+            background-size: 4px 4px, 7px 7px;
+            content: "";
+            opacity: 0.18;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+
+        .scroll-reveal {
+            opacity: 1;
+            transition: opacity 180ms ease;
+        }
+
+        @keyframes scrollRevealFromLeft {
+            from { opacity: 0; translate: -14px 0; }
+            to { opacity: 1; translate: 0 0; }
+        }
+
+        @keyframes scrollRevealFromRight {
+            from { opacity: 0; translate: 14px 0; }
+            to { opacity: 1; translate: 0 0; }
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .scroll-reveal:not(.is-visible) {
+                opacity: 0;
+            }
+
+            .scroll-reveal.is-visible.from-left {
+                animation: scrollRevealFromLeft 900ms cubic-bezier(0.3, 0, 0.2, 1) both;
+            }
+
+            .scroll-reveal.is-visible.from-right {
+                animation: scrollRevealFromRight 900ms cubic-bezier(0.3, 0, 0.2, 1) both;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html, body {
+                transition: none;
+            }
+
+            .scroll-reveal {
+                opacity: 1;
+                animation: none;
+                transition: none;
+                translate: none;
+            }
         }
 
         /* =====================================================================
-           3. CONTINUOUS INERTIA VERTICAL WHEEL TRACK & SEAM BRIDGES
+           3. CONTINUOUS VERTICAL PORTFOLIO FLOW
            ===================================================================== */
         #carousel-viewport {
-            position: fixed;
-            inset: 0;
+            position: relative;
             z-index: 10;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden !important;
-            cursor: grab;
-        }
-
-        #carousel-viewport.is-dragging {
-            cursor: grabbing;
+            width: 100%;
+            overflow: visible;
         }
 
         #carousel-track {
             position: relative;
-            display: flex;
-            flex-direction: column;
-            width: 100vw;
-            height: 600vh; /* 4 real slides + 2 edge clones for seamless infinite vertical wrap */
-            will-change: transform;
+            display: block;
+            width: 100%;
         }
 
         .slide-panel {
             position: relative;
-            width: 100vw;
-            height: 100vh;
-            flex-shrink: 0;
-            overflow: hidden !important;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             padding: 4.8rem 1.75rem 4.2rem 2.75rem;
-            will-change: transform;
+            scroll-margin-top: 0;
         }
 
         @media (min-width: 768px) {
@@ -190,7 +266,206 @@
             }
         }
 
-        /* Continuous Vertical Brushed-Gold Meridian Spine Spanning All 600vh */
+        @media (max-width: 767px) {
+            .slide-panel {
+                min-height: 100dvh;
+                justify-content: flex-start;
+                padding: 4.7rem 1rem 4.25rem 1.35rem;
+            }
+
+            .slide-panel > .max-w-6xl {
+                width: 100%;
+                margin-left: 0;
+                margin-right: auto;
+            }
+
+            header {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            header .max-w-7xl {
+                padding: 0;
+            }
+
+            header .gap-2\.5 span:first-child,
+            header .gap-2\.5 span:nth-child(2),
+            header .gap-2\.5 span:nth-child(3),
+            #theme-label {
+                display: none;
+            }
+
+            header button.font-roman {
+                font-size: 0.78rem;
+                letter-spacing: 0.12em;
+            }
+
+            #theme-toggle,
+            #share-toggle {
+                padding: 0.45rem;
+            }
+
+            #share-label {
+                display: none;
+            }
+
+            .cutout-stage {
+                min-height: 230px;
+            }
+
+            .cutout-canvas-el {
+                max-width: 190px;
+                max-height: 245px;
+            }
+
+            .cutout-pedestal {
+                width: 150px;
+            }
+
+            .backdrop-monument-text {
+                font-size: 2.25rem;
+            }
+
+            .roman-watermark {
+                font-size: 8rem;
+                bottom: 5vh;
+                opacity: 0.72;
+            }
+
+            .editorial-card {
+                border-radius: 2px;
+            }
+
+            [data-panel="2"] .editorial-card {
+                margin-bottom: 0.25rem;
+            }
+
+            [data-panel="3"] .editorial-card,
+            [data-panel="4"] .editorial-card,
+            [data-panel="5"] .editorial-card {
+                padding-left: 0.875rem;
+                padding-right: 0.875rem;
+            }
+
+            #case-study-modal {
+                padding: 0.75rem;
+                align-items: center;
+            }
+
+            #case-study-modal > div.relative {
+                max-height: calc(100dvh - 1.5rem);
+                overflow-y: auto;
+            }
+
+            #case-study-modal > div.relative > div {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+
+        .folio-wheel-nav {
+            position: fixed;
+            z-index: 40;
+            top: 50%;
+            right: -56px;
+            width: 112px;
+            height: 112px;
+            transform: translateY(-50%);
+            pointer-events: auto;
+        }
+
+        .folio-wheel {
+            --wheel-rotation: 0deg;
+            --number-angle: 225deg;
+            --number-radius: 34px;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(212, 175, 55, 0.28);
+            border-radius: 50%;
+            background: transparent;
+            transform: rotate(var(--wheel-rotation));
+            touch-action: none;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .folio-wheel::before {
+            position: absolute;
+            inset: 5px;
+            border: 1px dashed rgba(212, 175, 55, 0.24);
+            border-radius: 50%;
+            content: "";
+            pointer-events: none;
+        }
+
+        .folio-wheel::after {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            width: 2px;
+            height: 8px;
+            border-radius: 2px;
+            background: rgba(212, 175, 55, 0.62);
+            content: "";
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .folio-wheel:active {
+            cursor: grabbing;
+        }
+
+        .folio-wheel-center {
+            position: absolute;
+            inset: 50% auto auto 50%;
+            display: grid;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            padding: 0;
+            transform: translate(-50%, -50%) rotate(calc(var(--number-angle) - var(--wheel-rotation))) translateX(var(--number-radius)) rotate(calc(-1 * var(--number-angle)));
+            border: 0;
+            background: transparent;
+            color: var(--accent-gold);
+            cursor: pointer;
+        }
+
+        .folio-wheel-center strong {
+            color: var(--accent-gold);
+            font: 600 28px/1 'Cinzel', Georgia, serif;
+            font-weight: 600;
+            transition: color 180ms ease-out, text-shadow 180ms ease-out, transform 180ms ease-out;
+        }
+
+        .folio-wheel.is-moving .folio-wheel-center strong {
+            color: #F7D77A;
+            text-shadow: 0 0 5px var(--accent-gold), 0 0 16px var(--accent-gold);
+            transform: scale(1.12);
+        }
+
+        @media (max-width: 767px) {
+            .folio-wheel-nav {
+                right: -41px;
+                width: 82px;
+                height: 82px;
+            }
+
+            .folio-wheel {
+                --number-radius: 27px;
+            }
+
+            .folio-wheel-center strong {
+                font-size: 22px;
+            }
+        }
+
+        .loop-clone {
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Continuous Vertical Brushed-Gold Meridian Spine */
         .continuous-gold-meridian {
             position: absolute;
             top: 0;
@@ -213,60 +488,6 @@
             .continuous-gold-meridian {
                 left: 48px;
             }
-        }
-
-        /* Horizontal Seam Bridge Rules & Centered Roman Medallions at 100vh Seams */
-        .seam-bridge-line {
-            position: absolute;
-            left: 20px;
-            right: 20px;
-            height: 1px;
-            transform: translateY(-50%);
-            background: linear-gradient(
-                90deg,
-                var(--accent-gold) 0%,
-                var(--border-subtle) 35%,
-                var(--border-subtle) 65%,
-                var(--accent-gold) 100%
-            );
-            opacity: 0.48;
-            z-index: 15;
-            pointer-events: none;
-        }
-
-        @media (min-width: 768px) {
-            .seam-bridge-line {
-                left: 48px;
-                right: 48px;
-            }
-        }
-
-        .seam-bridge-medallion {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 44px;
-            height: 44px;
-            border-radius: 9999px;
-            border: 1px solid var(--accent-gold);
-            background-color: var(--bg-solid);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 16;
-            pointer-events: none;
-            box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.15);
-            transition: background-color 1.1s var(--gentle-ease), border-color 1.1s var(--gentle-ease);
-        }
-
-        .seam-bridge-medallion::before {
-            content: '';
-            position: absolute;
-            inset: 4px;
-            border-radius: 9999px;
-            border: 1px dashed var(--accent-gold);
-            opacity: 0.55;
         }
 
         /* Oversized Parallax Roman Numeral Watermarks */
@@ -295,6 +516,18 @@
             transition: transform 0.9s var(--gentle-ease), border-color 0.9s var(--gentle-ease), box-shadow 0.9s var(--gentle-ease), background-color 1.1s var(--gentle-ease);
         }
 
+        .contact-value {
+            display: block;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .contact-email {
+            white-space: nowrap;
+            overflow-wrap: normal;
+            font-size: clamp(0.75rem, 4.4vw, 1.075rem);
+        }
+
         .editorial-card:hover {
             transform: translateY(-4px);
             border-color: var(--accent-gold);
@@ -309,6 +542,11 @@
         .editorial-card:hover img {
             transform: scale(1.035);
             filter: grayscale(20%) sepia(6%) contrast(104%);
+        }
+
+        .editorial-card img.project-artwork,
+        .editorial-card:hover img.project-artwork {
+            filter: none;
         }
 
         /* =====================================================================
@@ -357,18 +595,57 @@
             animation: gentleFloat 7.5s ease-in-out infinite;
         }
 
+        .portrait-frame {
+            position: absolute;
+            z-index: 0;
+            inset: -12px -16px 20px;
+            border: 2px solid var(--accent-gold);
+            background: var(--bg-solid);
+            box-shadow: 0 16px 24px -16px var(--cutout-shadow);
+            clip-path: polygon(1.5% 0, 100% 2.5%, 98% 100%, 0 97%);
+            transform: rotate(-8deg) skewY(1.5deg);
+            pointer-events: none;
+        }
+
+        .portrait-frame::before {
+            position: absolute;
+            inset: 6px;
+            border: 1px solid var(--border-hairline);
+            content: "";
+            pointer-events: none;
+        }
+
+        .portrait-frame::after {
+            position: absolute;
+            inset: -2px;
+            background:
+                linear-gradient(var(--accent-gold), var(--accent-gold)) left top / 18px 2px no-repeat,
+                linear-gradient(var(--accent-gold), var(--accent-gold)) left top / 2px 18px no-repeat,
+                linear-gradient(var(--accent-gold), var(--accent-gold)) right top / 18px 2px no-repeat,
+                linear-gradient(var(--accent-gold), var(--accent-gold)) right top / 2px 18px no-repeat,
+                linear-gradient(var(--accent-gold), var(--accent-gold)) left bottom / 18px 2px no-repeat,
+                linear-gradient(var(--accent-gold), var(--accent-gold)) left bottom / 2px 18px no-repeat,
+                linear-gradient(var(--accent-gold), var(--accent-gold)) right bottom / 18px 2px no-repeat,
+                linear-gradient(var(--accent-gold), var(--accent-gold)) right bottom / 2px 18px no-repeat;
+            content: "";
+            pointer-events: none;
+        }
+
         @keyframes gentleFloat {
             0%, 100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
             50% { transform: translateY(-6px) rotateX(1deg) rotateY(-1deg); }
         }
 
         .cutout-canvas-el {
+            position: relative;
+            z-index: 1;
             display: block;
             max-width: 235px;
             max-height: 300px;
             width: auto;
             height: auto;
-            filter: drop-shadow(0 20px 24px var(--cutout-shadow));
+            opacity: 0.82;
+            filter: drop-shadow(0 14px 18px rgba(24, 24, 27, 0.16));
             transition: filter 1.1s var(--gentle-ease);
         }
 
@@ -408,6 +685,19 @@
         .theme-pill:hover {
             border-color: var(--accent-gold);
         }
+
+        #share-qr-code {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #share-qr-code img,
+        #share-qr-code canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -417,6 +707,7 @@
     <div id="bg-photo-1" class="bg-photo-layer" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1800&q=75');"></div>
     <div id="bg-photo-2" class="bg-photo-layer" style="background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1800&q=75');"></div>
     <div id="bg-photo-3" class="bg-photo-layer" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1800&q=75');"></div>
+    <div id="bg-photo-4" class="bg-photo-layer" style="background-image: url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1800&q=75');"></div>
     <div class="paper-vignette"></div>
 
     <!-- =====================================================================
@@ -437,86 +728,30 @@
                     Bo Senghour<span class="gold-text">.</span>
                 </button>
 
-                <!-- Right Theme Toggle Pill -->
-                <button id="theme-toggle" type="button" onclick="toggleTheme(event)" class="theme-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs" aria-label="Toggle Light and Dark Theme">
-                    <i data-lucide="moon" id="icon-moon" class="w-3.5 h-3.5 gold-text pointer-events-none"></i>
-                    <i data-lucide="sun" id="icon-sun" class="w-3.5 h-3.5 gold-text hidden pointer-events-none"></i>
-                    <span id="theme-label" class="font-roman text-[10px] tracking-[0.18em] uppercase font-medium pointer-events-none">Obsidian</span>
-                </button>
+                <!-- Right Header Actions -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <button id="share-toggle" type="button" onclick="openShareModal()" class="theme-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs" aria-label="Share portfolio">
+                        <i data-lucide="qr-code" class="w-3.5 h-3.5 gold-text pointer-events-none"></i>
+                        <span id="share-label" class="font-roman text-[10px] tracking-[0.18em] uppercase font-medium pointer-events-none">Share</span>
+                    </button>
+                    <button id="theme-toggle" type="button" onclick="toggleTheme(event)" class="theme-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs" aria-label="Toggle Light and Dark Theme">
+                        <i data-lucide="moon" id="icon-moon" class="w-3.5 h-3.5 gold-text pointer-events-none"></i>
+                        <i data-lucide="sun" id="icon-sun" class="w-3.5 h-3.5 gold-text hidden pointer-events-none"></i>
+                        <span id="theme-label" class="font-roman text-[10px] tracking-[0.18em] uppercase font-medium pointer-events-none">Obsidian</span>
+                    </button>
+                </div>
             </div>
             <div class="broadsheet-rule-double w-full"></div>
         </div>
     </header>
 
     <!-- =====================================================================
-         MAIN FULL-VIEWPORT CONTINUOUS INERTIA VERTICAL WHEEL CAROUSEL
+         CONTINUOUS VERTICAL PORTFOLIO
          ===================================================================== -->
     <main id="carousel-viewport">
         <div id="carousel-track">
 
-            <!-- Continuous Vertical Gold Meridian Spine Spanning All Slides -->
-            <div class="continuous-gold-meridian"></div>
-
-            <!-- Horizontal Seam Bridge Rules & Roman Compass Medallions on Every 100vh Seam -->
-            <div class="seam-bridge-line" style="top: 100vh;" aria-hidden="true">
-                <div class="seam-bridge-medallion">
-                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="seam-bridge-line" style="top: 200vh;" aria-hidden="true">
-                <div class="seam-bridge-medallion">
-                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="seam-bridge-line" style="top: 300vh;" aria-hidden="true">
-                <div class="seam-bridge-medallion">
-                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="seam-bridge-line" style="top: 400vh;" aria-hidden="true">
-                <div class="seam-bridge-medallion">
-                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="seam-bridge-line" style="top: 500vh;" aria-hidden="true">
-                <div class="seam-bridge-medallion">
-                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- =================================================================
-                 CLONE OF SLIDE IV (Index 0 — Enables Seamless Upward Loop)
-                 ================================================================= -->
-            <section class="slide-panel" data-panel="0" aria-hidden="true">
-                <div class="roman-watermark" data-watermark="0">IV</div>
-                <div class="max-w-6xl w-full mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                    <div class="lg:col-span-6 space-y-5">
-                        <p class="font-roman text-xs tracking-[0.25em] uppercase gold-text">Section IV &mdash; Correspondence</p>
-                        <h2 class="font-broadsheet text-3xl sm:text-5xl font-normal leading-tight">
-                            Initiate an <mark class="gold-highlight italic">Editorial Inquiry</mark> or Research Dialogue.
-                        </h2>
-                        <p class="drop-cap text-base sm:text-lg leading-relaxed" style="color: var(--text-secondary);">
-                            Available in Phnom Penh and remotely for data engineering collaborations, scientific dataset indexing, hackathon teams, and applied intelligence systems.
-                        </p>
-                    </div>
-                    <div class="lg:col-span-6">
-                        <div class="editorial-card p-7 rounded-sm space-y-4">
-                            <p class="font-roman text-xs tracking-[0.2em] uppercase" style="color: var(--text-muted);">Direct Electronic Telegraph</p>
-                            <p class="font-broadsheet text-2xl sm:text-3xl">bosenghour@example.com</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <div class="continuous-gold-meridian" aria-hidden="true"></div>
 
             <!-- =================================================================
                  SLIDE I: COVER & 3D CARDBOARD POP-OUT PORTRAIT (Index 1)
@@ -530,7 +765,7 @@
                     <div class="lg:col-span-7 space-y-5 order-2 lg:order-1">
                         <div class="space-y-2">
                             <p class="font-roman text-xs tracking-[0.26em] uppercase gold-text font-medium">
-                                Section I &mdash; Data Science &amp; Engineering
+                                Section I &mdash; IBM &amp; DSE
                             </p>
                             <h1 class="font-broadsheet text-3xl sm:text-5xl lg:text-[3.25rem] font-normal leading-[1.12] tracking-tight">
                                 Engineering <mark class="gold-highlight italic">resilient data pipelines</mark> &amp; applied intelligence.
@@ -540,8 +775,19 @@
                         <div class="w-16 h-[1px]" style="background-color: var(--accent-gold);"></div>
 
                         <p class="drop-cap text-base sm:text-lg leading-relaxed max-w-xl" style="color: var(--text-secondary);">
-                            Undergraduate scholar in Data Science &amp; Engineering at the Royal University of Phnom Penh. Specializing in scientific combustion datasets, deterministic retrieval architectures, and embedded telemetry.
+                            RUPP student pursuing International Business Management (IBM) and Data Science &amp; Engineering (DSE), combining business strategy with data-driven problem-solving. Customer-focused, adaptable, and ready to contribute independently or as part of a team.
                         </p>
+
+                        <div class="grid grid-cols-2 gap-3 max-w-xl">
+                            <div class="border-t hairline-border pt-2">
+                                <p class="font-roman text-[10px] tracking-[0.18em] uppercase gold-text">IBM</p>
+                                <p class="font-broadsheet text-sm sm:text-base leading-snug">International Business Management</p>
+                            </div>
+                            <div class="border-t hairline-border pt-2">
+                                <p class="font-roman text-[10px] tracking-[0.18em] uppercase gold-text">DSE</p>
+                                <p class="font-broadsheet text-sm sm:text-base leading-snug">Data Science &amp; Engineering</p>
+                            </div>
+                        </div>
 
                         <div class="pt-1 flex flex-wrap items-center gap-5">
                             <button onclick="stepSlide(1)" class="inline-flex items-center gap-3 px-6 py-2.5 rounded-sm font-roman text-xs tracking-[0.2em] uppercase border gold-border transition-opacity hover:opacity-85 cursor-pointer" style="background-color: var(--text-primary); color: var(--bg-primary);">
@@ -550,7 +796,7 @@
                             </button>
 
                             <span class="text-xs italic" style="color: var(--text-muted);">
-                                Scroll mouse wheel or drag vertically to turn folios &darr;
+                                Scroll to explore the full portfolio &darr;
                             </span>
                         </div>
                     </div>
@@ -563,8 +809,9 @@
                                 BO<br>SENG<br>HOUR
                             </div>
 
-                            <!-- Layer 2 (z-index: 20): Background-Free 3D Die-Cut Cardboard Portrait -->
+                            <!-- Layer 2 (z-index: 20): Crooked Editorial Frame and Background-Free Portrait -->
                             <div id="cardboard-3d" class="cardboard-3d-wrapper">
+                                <div class="portrait-frame" aria-hidden="true"></div>
                                 <canvas id="cutout-canvas" class="cutout-canvas-el" width="420" height="540" aria-label="3D Cardboard Cutout Portrait of Bo Senghour"></canvas>
                             </div>
 
@@ -572,14 +819,9 @@
                             <div class="cutout-pedestal"></div>
                         </div>
 
-                        <!-- Discreet Portrait File Selector -->
+                        <!-- Portrait Caption -->
                         <div class="mt-2.5 flex items-center gap-2.5 text-[10px] font-roman tracking-[0.18em] uppercase" style="color: var(--text-muted);">
                             <span>Fig. I &mdash; Portrait Cutout</span>
-                            <span>&bull;</span>
-                            <label for="portrait-file-input" class="gold-text underline cursor-pointer hover:opacity-80">
-                                Replace Portrait
-                            </label>
-                            <input id="portrait-file-input" type="file" accept="image/*" class="hidden" onchange="handlePortraitUpload(event)">
                         </div>
                     </div>
 
@@ -613,21 +855,26 @@
                         <!-- 01. FlameLens -->
                         <article onclick="openCaseStudy('flamelens')" class="editorial-card rounded-sm overflow-hidden flex flex-col justify-between cursor-pointer group">
                             <div>
-                                <div class="relative h-32 sm:h-36 overflow-hidden border-b hairline-border">
-                                    <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=900&q=75" alt="Microgravity Orbital Combustion" class="w-full h-full object-cover">
+                                <div class="relative h-32 sm:h-36 overflow-hidden border-b hairline-border" style="background-color: #0B1220;">
+                                    <img src="Space_Apps_Logo_Color_and_White.width-440.jpegquality-60.png" alt="NASA Space Apps Challenge logo" class="project-artwork w-full h-full object-contain p-5">
                                     <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 text-[10px] font-roman tracking-[0.2em] uppercase border gold-border gold-text font-semibold" style="background-color: var(--bg-solid);">
                                         01
                                     </span>
                                 </div>
                                 <div class="p-4 sm:p-5 space-y-2">
                                     <p class="font-roman text-[10px] tracking-[0.18em] uppercase gold-text">
-                                        NASA Space Apps Challenge
+                                        NASA Space Apps Challenge &bull;
+                                        <a href="https://spaceappschallenge.org/2026/find-a-team/chnai-lab?tab=members" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="underline decoration-dotted underline-offset-2 hover:decoration-solid">
+                                            CHNAI LAB
+                                        </a>
                                     </p>
                                     <h3 class="font-broadsheet text-xl sm:text-2xl font-medium group-hover:underline">
-                                        FlameLens
+                                        <a href="https://flamelens.si" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="underline decoration-dotted underline-offset-4 hover:decoration-solid">
+                                            FlameLens
+                                        </a>
                                     </h3>
                                     <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-secondary);">
-                                        AI-Powered Microgravity Fire Safety Engine indexing NASA PSI datasets (<mark class="gold-highlight">BASS, FLEX, ACME</mark>) in SQLite with Gemini AI.
+                                        SI-powered microgravity fire safety engine indexing NASA PSI datasets (<mark class="gold-highlight">BASS, FLEX, ACME</mark>) in SQLite, with Claude on Amazon Bedrock.
                                     </p>
                                 </div>
                             </div>
@@ -639,58 +886,63 @@
                             </div>
                         </article>
 
-                        <!-- 02. DSE Apparel & Supply Pipeline -->
+                        <!-- 02. Cozy Corner Event Operator -->
                         <article onclick="openCaseStudy('dse')" class="editorial-card rounded-sm overflow-hidden flex flex-col justify-between cursor-pointer group">
                             <div>
-                                <div class="relative h-32 sm:h-36 overflow-hidden border-b hairline-border">
-                                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=75" alt="Cross-Border Freight Logistics" class="w-full h-full object-cover">
+                                <div class="relative h-32 sm:h-36 overflow-hidden border-b hairline-border" style="background-color: #204B91;">
+                                    <img src="621174643_122183678276472117_3696740522021128256_n.jpg" alt="Cozy Corner brand banner" class="project-artwork w-full h-full object-contain">
                                     <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 text-[10px] font-roman tracking-[0.2em] uppercase border gold-border gold-text font-semibold" style="background-color: var(--bg-solid);">
                                         02
                                     </span>
                                 </div>
                                 <div class="p-4 sm:p-5 space-y-2">
                                     <p class="font-roman text-[10px] tracking-[0.18em] uppercase gold-text">
-                                        Vector &amp; Logistics Systems
+                                        Event Operations &bull; October-November 2026
                                     </p>
                                     <h3 class="font-broadsheet text-xl sm:text-2xl font-medium group-hover:underline">
-                                        DSE Apparel &amp; Supply Pipeline
+                                        <a href="https://web.facebook.com/profile.php?id=61586694644062" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="underline decoration-dotted underline-offset-4 hover:decoration-solid">
+                                            Cozy Corner
+                                        </a>
                                     </h3>
                                     <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-secondary);">
-                                        Cross-border production vectorization, 1688 sourcing, and freight logistics from <mark class="gold-highlight">Guangzhou to Phnom Penh</mark>.
+                                        Customer service and event operations: resolving guest needs, maintaining service flow, and supporting the Halloween event at <mark class="gold-highlight">Borey Peng Huoth Boeung Snor</mark>.
                                     </p>
                                 </div>
                             </div>
                             <div class="px-4 sm:px-5 py-3 border-t hairline-border flex items-center justify-between text-[11px] font-roman tracking-[0.16em] uppercase">
-                                <span style="color: var(--text-muted);">Vector &bull; 1688 Ops</span>
+                                <span style="color: var(--text-muted);">Customer &bull; Operations</span>
                                 <span class="gold-text inline-flex items-center gap-1">
                                     Inspect <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
                                 </span>
                             </div>
                         </article>
 
-                        <!-- 03. ESP32 Telemetry Node -->
-                        <article onclick="openCaseStudy('esp32')" class="editorial-card rounded-sm overflow-hidden flex flex-col justify-between cursor-pointer group">
+                        <!-- 03. IoT -->
+                        <article onclick="openCaseStudy('iot')" class="editorial-card rounded-sm overflow-hidden flex flex-col justify-between cursor-pointer group">
                             <div>
                                 <div class="relative h-32 sm:h-36 overflow-hidden border-b hairline-border">
-                                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=75" alt="Embedded Microcontroller Hardware" class="w-full h-full object-cover">
+                                    <img src="esp32-dev-board.jpg" alt="ESP32 development boards from Espressif" class="project-artwork w-full h-full object-cover">
                                     <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 text-[10px] font-roman tracking-[0.2em] uppercase border gold-border gold-text font-semibold" style="background-color: var(--bg-solid);">
                                         03
                                     </span>
                                 </div>
                                 <div class="p-4 sm:p-5 space-y-2">
                                     <p class="font-roman text-[10px] tracking-[0.18em] uppercase gold-text">
-                                        Embedded Edge Acquisition
+                                        IoT Hardware
                                     </p>
                                     <h3 class="font-broadsheet text-xl sm:text-2xl font-medium group-hover:underline">
-                                        ESP32 Telemetry Node
+                                        IoT
                                     </h3>
                                     <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-secondary);">
-                                        Type-C ESP32 microcontroller node with deterministic GPIO mapping and <mark class="gold-highlight">local SQLite logging</mark>.
+                                        ESP32 development board for connected sensors and simple data logging.
+                                    </p>
+                                    <p class="text-[9px] leading-relaxed" style="color: var(--text-muted);">
+                                        Image: <a href="https://www.espressif.com/en/products/devkits/esp32-devkitc" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="hover:underline">Espressif ESP32-DevKitC</a>
                                     </p>
                                 </div>
                             </div>
                             <div class="px-4 sm:px-5 py-3 border-t hairline-border flex items-center justify-between text-[11px] font-roman tracking-[0.16em] uppercase">
-                                <span style="color: var(--text-muted);">ESP32 &bull; SQLite</span>
+                                <span style="color: var(--text-muted);">IoT &bull; ESP32</span>
                                 <span class="gold-text inline-flex items-center gap-1">
                                     Inspect <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
                                 </span>
@@ -721,20 +973,28 @@
                         </div>
 
                         <p class="drop-cap text-sm sm:text-base leading-relaxed" style="color: var(--text-secondary);">
-                            Pursuing a Bachelor of Science in Data Science &amp; Engineering at the Royal University of Phnom Penh, bridging statistical modeling and relational data engines with hands-on software and microcontroller systems. Completed General English Program Level 12 at the Australian Centre for Education.
+                            Second-year student at the Royal University of Phnom Penh in International Business Management and Data Science &amp; Engineering. Graduate of BELTEI International School and the Australian Centre for Education, with a strong foundation in communication, operations, and technical media.
                         </p>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div class="editorial-card p-4 sm:p-5 rounded-sm space-y-1">
                                 <span class="font-roman text-[10px] tracking-[0.2em] uppercase gold-text">Education I</span>
                                 <h3 class="font-broadsheet text-lg sm:text-xl font-medium">Royal University of Phnom Penh</h3>
                                 <p class="text-xs sm:text-sm" style="color: var(--text-secondary);">
-                                    B.Sc. in Data Science &amp; Engineering
+                                    IBM &amp; DSE &bull; Second year
                                 </p>
                             </div>
 
                             <div class="editorial-card p-4 sm:p-5 rounded-sm space-y-1">
                                 <span class="font-roman text-[10px] tracking-[0.2em] uppercase gold-text">Education II</span>
+                                <h3 class="font-broadsheet text-lg sm:text-xl font-medium">BELTEI International School</h3>
+                                <p class="text-xs sm:text-sm" style="color: var(--text-secondary);">
+                                    Grade 12 &mdash; Science Stream &bull; Bac II: Grade C
+                                </p>
+                            </div>
+
+                            <div class="editorial-card p-4 sm:p-5 rounded-sm space-y-1">
+                                <span class="font-roman text-[10px] tracking-[0.2em] uppercase gold-text">Education III</span>
                                 <h3 class="font-broadsheet text-lg sm:text-xl font-medium">Australian Centre for Education</h3>
                                 <p class="text-xs sm:text-sm" style="color: var(--text-secondary);">
                                     General English Program (GEP 12)
@@ -747,11 +1007,16 @@
                     <div class="lg:col-span-5 space-y-4">
                         <div class="editorial-card p-2.5 rounded-sm">
                             <div class="relative h-36 sm:h-40 overflow-hidden border hairline-border">
-                                <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1000&q=75" alt="Editorial Academic Architecture" class="w-full h-full object-cover">
+                                <img src="rupp-campus-2.jpg" alt="Royal University of Phnom Penh Campus II Main Building" class="w-full h-full object-cover">
                             </div>
-                            <div class="pt-2 px-1 flex items-center justify-between text-[10px] font-roman tracking-[0.16em] uppercase" style="color: var(--text-muted);">
-                                <span>Fig. II &mdash; Phnom Penh</span>
-                                <span class="gold-text">GMT+7</span>
+                            <div class="pt-2 px-1 space-y-1" style="color: var(--text-muted);">
+                                <div class="flex items-center justify-between text-[10px] font-roman tracking-[0.16em] uppercase">
+                                    <span>Fig. II &mdash; RUPP Campus II</span>
+                                    <span class="gold-text">GMT+7</span>
+                                </div>
+                                <a href="https://rupp.edu.kh/" target="_blank" rel="noopener noreferrer" class="block text-[9px] font-roman tracking-[0.12em] uppercase hover:underline">
+                                    Photo: Royal University of Phnom Penh
+                                </a>
                             </div>
                         </div>
 
@@ -760,10 +1025,18 @@
                             <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm" style="color: var(--text-secondary);">
                                 <div>&bull; Python &amp; Pandas</div>
                                 <div>&bull; SQLite &amp; SQL</div>
-                                <div>&bull; HTML, CSS &amp; JS</div>
-                                <div>&bull; ESP32 &amp; GPIO</div>
-                                <div>&bull; Git &amp; Version Control</div>
-                                <div>&bull; VS Code &amp; Gemini API</div>
+                                <div>&bull; MS Word &amp; Excel</div>
+                                <div>&bull; MS PowerPoint</div>
+                                <div>&bull; Canva &amp; Photoshop</div>
+                                <div>&bull; DaVinci Resolve</div>
+                            </div>
+                            <div class="pt-2 border-t hairline-border text-xs leading-relaxed" style="color: var(--text-secondary);">
+                                <span class="gold-text font-roman tracking-[0.12em] uppercase">Certifications</span><br>
+                                IELTS 6.5 &bull; ACE Graduate 2023 &bull; Bac II Grade C &bull; PUC 100% Scholarship 2026
+                            </div>
+                            <div class="pt-2 border-t hairline-border text-xs leading-relaxed" style="color: var(--text-secondary);">
+                                <span class="gold-text font-roman tracking-[0.12em] uppercase">Languages</span><br>
+                                Khmer — Native &bull; English — Upper-Intermediate &bull; German — Beginner
                             </div>
                         </div>
                     </div>
@@ -791,11 +1064,15 @@
                         </p>
 
                         <div class="pt-1 flex flex-wrap items-center gap-6 font-roman text-xs tracking-[0.2em] uppercase">
-                            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 border-b gold-border pb-1 hover:opacity-75">
+                            <button onclick="snapToTarget(5)" class="inline-flex items-center gap-1.5 border-b gold-border pb-1 hover:opacity-75">
+                                <span>View CV</span>
+                                <i data-lucide="file-text" class="w-3.5 h-3.5 gold-text"></i>
+                            </button>
+                            <a href="https://github.com/Saiukuma" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 border-b gold-border pb-1 hover:opacity-75">
                                 <span>GitHub</span>
                                 <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 gold-text"></i>
                             </a>
-                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 border-b gold-border pb-1 hover:opacity-75">
+                            <a href="https://www.linkedin.com/in/bo-senghour-a49794242/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 border-b gold-border pb-1 hover:opacity-75">
                                 <span>LinkedIn</span>
                                 <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 gold-text"></i>
                             </a>
@@ -809,10 +1086,21 @@
                                 <span class="text-xs italic" style="color: var(--text-muted);">Phnom Penh &bull; GMT+7</span>
                             </div>
 
-                            <div class="space-y-1.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2 gap-4">
+                                <div class="min-w-0 space-y-1.5">
+                                    <p class="text-[11px] uppercase font-roman tracking-[0.18em]" style="color: var(--text-muted);">Email</p>
+                                    <span class="contact-value contact-email font-broadsheet">senghour.appleid@gmail.com</span>
+                                </div>
+                                <div class="min-w-0 space-y-1.5">
+                                    <p class="text-[11px] uppercase font-roman tracking-[0.18em]" style="color: var(--text-muted);">Phone &bull; Telegram</p>
+                                    <span class="contact-value font-broadsheet text-lg sm:text-xl">099 535 587 &bull; @saiukuma</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5 border-t hairline-border pt-4">
                                 <p class="text-[11px] uppercase font-roman tracking-[0.18em]" style="color: var(--text-muted);">Address</p>
                                 <div class="flex flex-wrap items-center justify-between gap-3">
-                                    <span class="font-broadsheet text-xl sm:text-3xl">bosenghour@example.com</span>
+                                    <span class="font-broadsheet text-lg sm:text-xl">St. 118, No. 42, Phnom Penh, Cambodia</span>
                                     <button onclick="copyEmailAddress()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm border gold-border font-roman text-[11px] tracking-[0.18em] uppercase hover:opacity-80 cursor-pointer">
                                         <i data-lucide="copy" class="w-3.5 h-3.5 gold-text"></i>
                                         <span>Copy</span>
@@ -820,13 +1108,18 @@
                                 </div>
                             </div>
 
+                            <div class="border-t hairline-border pt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs" style="color: var(--text-secondary);">
+                                <span><strong class="gold-text font-roman font-normal">Availability:</strong> Morning &bull; Weekends</span>
+                                <span><strong class="gold-text font-roman font-normal">Nationality:</strong> Cambodian</span>
+                            </div>
+
                             <div class="pt-3 flex flex-wrap items-center justify-between gap-4 border-t hairline-border">
                                 <span class="text-xs italic" style="color: var(--text-muted);">
                                     &copy; 2026 Bo Senghour
                                 </span>
 
-                                <button onclick="stepSlide(1)" class="font-roman text-xs tracking-[0.18em] uppercase gold-text hover:underline cursor-pointer">
-                                    Continue Wheel to Front Page (I) &darr;
+                                <button onclick="snapToTarget(1)" class="font-roman text-xs tracking-[0.18em] uppercase gold-text hover:underline cursor-pointer">
+                                    Return to Front Page (I) &uarr;
                                 </button>
                             </div>
                         </div>
@@ -836,31 +1129,36 @@
             </section>
 
             <!-- =================================================================
-                 CLONE OF SLIDE I (Index 5 — Enables Seamless Downward Loop)
+                 SLIDE V: CURRICULUM VITAE
                  ================================================================= -->
-            <section class="slide-panel" data-panel="5" aria-hidden="true">
-                <div class="roman-watermark" data-watermark="5">I</div>
-                <div class="max-w-6xl w-full mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
-                    <div class="lg:col-span-7 space-y-5 order-2 lg:order-1">
-                        <p class="font-roman text-xs tracking-[0.26em] uppercase gold-text font-medium">
-                            Section I &mdash; Data Science &amp; Engineering
-                        </p>
-                        <h2 class="font-broadsheet text-3xl sm:text-5xl lg:text-[3.25rem] font-normal leading-[1.12] tracking-tight">
-                            Engineering <mark class="gold-highlight italic">resilient data pipelines</mark> &amp; applied intelligence.
-                        </h2>
-                        <div class="w-16 h-[1px]" style="background-color: var(--accent-gold);"></div>
-                        <p class="drop-cap text-base sm:text-lg leading-relaxed max-w-xl" style="color: var(--text-secondary);">
-                            Undergraduate scholar in Data Science &amp; Engineering at the Royal University of Phnom Penh. Specializing in scientific combustion datasets, deterministic retrieval architectures, and embedded telemetry.
-                        </p>
-                    </div>
-                    <div class="lg:col-span-5 flex flex-col items-center justify-center order-1 lg:order-2">
-                        <div class="cutout-stage">
-                            <div class="backdrop-monument-text">BO<br>SENG<br>HOUR</div>
-                            <div class="cardboard-3d-wrapper">
-                                <canvas id="cutout-canvas-clone" class="cutout-canvas-el" width="420" height="540"></canvas>
-                            </div>
-                            <div class="cutout-pedestal"></div>
+            <section class="slide-panel" data-panel="5">
+                <div class="roman-watermark" data-watermark="5">V</div>
+                <div class="max-w-6xl w-full mx-auto relative z-10 space-y-3">
+                    <div class="flex flex-wrap items-end justify-between gap-3 border-b hairline-border pb-3">
+                        <div>
+                            <p class="font-roman text-xs tracking-[0.26em] uppercase gold-text font-medium mb-1">
+                                Section V &mdash; Curriculum Vitae
+                            </p>
+                            <h2 class="font-broadsheet text-2xl sm:text-4xl font-normal">
+                                Professional <mark class="gold-highlight italic">Record</mark>
+                            </h2>
                         </div>
+                        <div class="flex flex-wrap items-center gap-4 font-roman text-[11px] tracking-[0.16em] uppercase">
+                            <a href="Bo_Senghour_CV_V4.pdf" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 border gold-border gold-text hover:opacity-75">
+                                Preview CV
+                                <i data-lucide="external-link" class="w-3.5 h-3.5 gold-text"></i>
+                            </a>
+                            <a href="Bo_Senghour_CV_V4.pdf" download class="inline-flex items-center gap-2 px-4 py-2 border gold-border gold-text hover:opacity-75">
+                                Download CV
+                                <i data-lucide="download" class="w-3.5 h-3.5 gold-text"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="editorial-card rounded-sm p-8 sm:p-14 text-center space-y-4">
+                        <i data-lucide="file-text" class="w-10 h-10 mx-auto gold-text"></i>
+                        <p class="font-broadsheet text-xl sm:text-2xl">Bo Senghour &mdash; Curriculum Vitae</p>
+                        <p class="text-sm sm:text-base" style="color: var(--text-secondary);">Preview the PDF in a new tab or download a copy.</p>
                     </div>
                 </div>
             </section>
@@ -868,42 +1166,13 @@
         </div>
     </main>
 
-    <!-- =====================================================================
-         BOTTOM BROADSHEET PAGINATION BAR, PROGRESS TRACK & PREV/NEXT TRIGGERS
-         ===================================================================== -->
-    <footer class="fixed bottom-0 left-0 right-0 z-40 px-6 sm:px-12 pb-3.5 pt-2 pointer-events-none">
-        <div class="max-w-7xl mx-auto">
-            <!-- Continuous Gold Wheel Progress Track -->
-            <div class="relative w-full h-[2px] mb-2.5 overflow-hidden" style="background-color: var(--border-subtle);">
-                <div id="wheel-progress-bar" class="h-full w-1/4 transition-transform duration-150 ease-out" style="background-color: var(--accent-gold);"></div>
-            </div>
-
-            <div class="flex items-center justify-between gap-4 pointer-events-auto">
-                <!-- Previous Slide Trigger -->
-                <button onclick="stepSlide(-1)" class="inline-flex items-center gap-2 font-roman text-xs tracking-[0.2em] uppercase hover:opacity-75 cursor-pointer py-1">
-                    <i data-lucide="arrow-up" class="w-3.5 h-3.5 gold-text"></i>
-                    <span>Prev</span>
-                </button>
-
-                <!-- Roman Numeral Chapter Indicators -->
-                <div class="flex items-center gap-4 sm:gap-7 font-roman text-xs tracking-[0.22em]">
-                    <button onclick="snapToTarget(1)" data-indicator="1" class="chapter-dot cursor-pointer py-1 transition-all gold-text font-bold">I</button>
-                    <span class="opacity-30">&bull;</span>
-                    <button onclick="snapToTarget(2)" data-indicator="2" class="chapter-dot cursor-pointer py-1 transition-all opacity-55 hover:opacity-100">II</button>
-                    <span class="opacity-30">&bull;</span>
-                    <button onclick="snapToTarget(3)" data-indicator="3" class="chapter-dot cursor-pointer py-1 transition-all opacity-55 hover:opacity-100">III</button>
-                    <span class="opacity-30">&bull;</span>
-                    <button onclick="snapToTarget(4)" data-indicator="4" class="chapter-dot cursor-pointer py-1 transition-all opacity-55 hover:opacity-100">IV</button>
-                </div>
-
-                <!-- Next Slide Trigger -->
-                <button onclick="stepSlide(1)" class="inline-flex items-center gap-2 font-roman text-xs tracking-[0.2em] uppercase hover:opacity-75 cursor-pointer py-1">
-                    <span>Next</span>
-                    <i data-lucide="arrow-down" class="w-3.5 h-3.5 gold-text"></i>
-                </button>
-            </div>
+    <nav class="folio-wheel-nav" aria-label="Folio navigation">
+        <div id="folio-wheel" class="folio-wheel" role="group" aria-label="Drag to navigate between pages" title="Drag near the page number to scroll; click the number to advance">
+            <button id="wheel-number-button" type="button" class="folio-wheel-center" aria-current="page" aria-label="Current page I. Click to advance to the next page">
+                <strong id="wheel-current">I</strong>
+            </button>
         </div>
-    </footer>
+    </nav>
 
     <!-- =====================================================================
          CASE STUDY ARCHIVAL MODAL
@@ -938,6 +1207,36 @@
         </div>
     </div>
 
+    <!-- =====================================================================
+         PORTFOLIO SHARE MODAL
+         ===================================================================== -->
+    <div id="share-modal" class="fixed inset-0 z-[1100] hidden items-center justify-center p-4 sm:p-6">
+        <div onclick="closeShareModal()" class="fixed inset-0 bg-black/65 backdrop-blur-xs"></div>
+        <div role="dialog" aria-modal="true" aria-labelledby="share-title" class="relative z-10 w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-sm border hairline-border shadow-2xl" style="background-color: var(--bg-solid);">
+            <div class="px-6 py-4 border-b hairline-border flex items-center justify-between gap-4">
+                <h2 id="share-title" class="font-roman text-xs tracking-[0.22em] uppercase gold-text font-medium">Share this Chronicle</h2>
+                <button type="button" onclick="closeShareModal()" class="p-1.5 hover:opacity-70 cursor-pointer" aria-label="Close share dialog">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 sm:p-8 text-center">
+                <p class="text-sm mb-5" style="color: var(--text-secondary);">Scan the QR code or copy the portfolio link.</p>
+                <div class="mx-auto mb-5 grid h-[224px] w-[224px] place-items-center rounded-sm p-3" style="background-color: #FFFFFF;">
+                    <div id="share-qr-code" role="img" aria-label="QR code for the portfolio"></div>
+                </div>
+                <label for="share-url" class="block mb-2 text-left font-roman text-[10px] tracking-[0.18em] uppercase" style="color: var(--text-muted);">Portfolio link</label>
+                <div class="flex items-stretch gap-2">
+                    <input id="share-url" type="text" readonly class="min-w-0 flex-1 rounded-sm border hairline-border px-3 py-2 text-xs" style="background-color: var(--bg-primary); color: var(--text-primary);" aria-label="Portfolio link">
+                    <button id="share-copy-button" type="button" onclick="copyPortfolioLink()" class="theme-pill inline-flex shrink-0 items-center gap-2 rounded-sm px-3 py-2 text-xs" aria-label="Copy portfolio link">
+                        <i data-lucide="copy" class="w-3.5 h-3.5 gold-text pointer-events-none"></i>
+                        <span class="font-roman text-[10px] tracking-[0.12em] uppercase">Copy</span>
+                    </button>
+                </div>
+                <p id="share-status" class="mt-4 min-h-5 text-xs" style="color: var(--text-muted);" aria-live="polite"></p>
+            </div>
+        </div>
+    </div>
+
     <!-- Editorial Toast Notification -->
     <div id="editorial-toast" class="fixed bottom-16 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-700 pointer-events-none">
         <div class="px-4 py-2.5 rounded-sm border gold-border shadow-lg flex items-center gap-2.5 text-xs font-roman tracking-[0.15em] uppercase" style="background-color: var(--bg-solid);">
@@ -950,238 +1249,338 @@
         lucide.createIcons();
 
         /* =====================================================================
-           1. FREE-FLOWING VELOCITY-BASED INERTIAL WHEEL ENGINE (NON-FORCING)
+           1. CONTINUOUS DOCUMENT SCROLL & FOLIO NAVIGATION
            ===================================================================== */
-        const track = document.getElementById('carousel-track');
-        const viewport = document.getElementById('carousel-viewport');
-        const progressBar = document.getElementById('wheel-progress-bar');
-        const slidePanels = document.querySelectorAll('.slide-panel');
-        const watermarks = document.querySelectorAll('.roman-watermark');
+        const carouselTrack = document.getElementById('carousel-track');
+        const slidePanels = Array.from(carouselTrack.querySelectorAll('.slide-panel'));
 
-        // Slide coordinates:
-        // 0 = Clone IV, 1 = Real I, 2 = Real II, 3 = Real III, 4 = Real IV, 5 = Clone I
-        let currentPos = 1.0;
-        let velocity = 0.0;
-        let autoGlideTarget = null; // Used ONLY when user explicitly clicks a nav button; cancelled on any manual scroll/drag
-        let isDragging = false;
-        let dragLastY = 0;
-        let dragLastTime = 0;
-        let lastFrameTime = performance.now();
-        let lastActiveLogical = 1;
+        function createLoopClone(panel, copyName) {
+            const clone = panel.cloneNode(true);
+            clone.classList.add('loop-clone');
+            clone.dataset.loopClone = copyName;
+            clone.setAttribute('aria-hidden', 'true');
+            clone.querySelectorAll('[id]').forEach(element => element.removeAttribute('id'));
+            clone.querySelectorAll('a, button, input, select, textarea, [tabindex]').forEach(element => {
+                element.setAttribute('tabindex', '-1');
+            });
+            return clone;
+        }
+
+        const leadingLoopClone = createLoopClone(slidePanels[slidePanels.length - 1], 'leading');
+        const trailingLoopClone = createLoopClone(slidePanels[0], 'trailing');
+        carouselTrack.insertBefore(leadingLoopClone, slidePanels[0]);
+        carouselTrack.appendChild(trailingLoopClone);
+
+        const folioWheel = document.getElementById('folio-wheel');
+        const wheelCurrent = document.getElementById('wheel-current');
+        const wheelNumberButton = document.getElementById('wheel-number-button');
+        const romanNumerals = ['I', 'II', 'III', 'IV', 'V'];
+        let isWheelDragging = false;
+        let wheelDragLastAngle = 0;
+        let wheelDragProgress = 1;
+        let wheelDragStartX = 0;
+        let wheelDragStartY = 0;
+        let wheelPointerMoved = false;
+        let suppressWheelClick = false;
+        let scrollIdleTimer;
+        let lastScrollY = window.scrollY;
+        let scrollDirection = 'down';
+
+        function initScrollReveals() {
+            if (!('IntersectionObserver' in window)) return;
+
+            const revealTargets = [];
+            document.querySelectorAll('.slide-panel > .max-w-6xl').forEach(content => {
+                let targetIndex = 0;
+                Array.from(content.children).forEach(item => {
+                    const cards = Array.from(item.children).filter(child => child.classList.contains('editorial-card'));
+                    const targets = cards.length ? cards : [item];
+                    targets.forEach(target => {
+                        target.classList.add('scroll-reveal');
+                        target.dataset.revealSide = targetIndex % 2 === 0 ? 'left' : 'right';
+                        targetIndex++;
+                        revealTargets.push(target);
+                    });
+                });
+            });
+
+            const pendingHideTimers = new WeakMap();
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    const target = entry.target;
+                    if (entry.isIntersecting) {
+                        const hideTimer = pendingHideTimers.get(target);
+                        if (hideTimer !== undefined) {
+                            window.clearTimeout(hideTimer);
+                            pendingHideTimers.delete(target);
+                        }
+                        if (target.classList.contains('is-visible')) return;
+
+                        const baseSide = target.dataset.revealSide;
+                        const fromLeft = scrollDirection === 'down'
+                            ? baseSide === 'left'
+                            : baseSide === 'right';
+                        target.classList.toggle('from-left', fromLeft);
+                        target.classList.toggle('from-right', !fromLeft);
+                        target.classList.add('is-visible');
+                        const panel = target.closest('.slide-panel');
+                        if (panel && panel.dataset.panel === '1') observer.unobserve(target);
+                    } else {
+                        if (!target.classList.contains('is-visible') || pendingHideTimers.has(target)) return;
+                        const hideTimer = window.setTimeout(() => {
+                            target.classList.remove('is-visible');
+                            pendingHideTimers.delete(target);
+                        }, 180);
+                        pendingHideTimers.set(target, hideTimer);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+            revealTargets.forEach(target => observer.observe(target));
+        }
 
         function isModalOpen() {
-            return !document.getElementById('case-study-modal').classList.contains('hidden');
+            return !document.getElementById('case-study-modal').classList.contains('hidden')
+                || !document.getElementById('share-modal').classList.contains('hidden');
         }
 
-        function snapToTarget(index) {
-            velocity = 0;
-            autoGlideTarget = index;
+        function getPanelTop(panel) {
+            return panel.getBoundingClientRect().top + window.scrollY;
         }
 
-        function stepSlide(delta) {
-            velocity = 0;
-            const base = autoGlideTarget !== null ? autoGlideTarget : Math.round(currentPos);
-            autoGlideTarget = base + delta;
-        }
-
-        // Normalize wheel deltas across mouse wheels (lines), trackpads (pixels), and page scrolls
-        function normalizeWheelDelta(e) {
-            const raw = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-            if (e.deltaMode === 1) return raw * 32; // Line mode -> px
-            if (e.deltaMode === 2) return raw * window.innerHeight; // Page mode -> px
-            return raw;
-        }
-
-        // Free-flowing Mouse Wheel & Trackpad Impulse (No Forced Snapping)
-        window.addEventListener('wheel', (e) => {
-            if (isModalOpen()) return;
-            e.preventDefault();
-
-            // Immediately yield any button-triggered glide back to manual control
-            autoGlideTarget = null;
-
-            const pxDelta = normalizeWheelDelta(e);
-            // Gentle, silk-smooth impulse capped so trackpad flicks glide gracefully without jumping wildly
-            const impulse = Math.max(-0.022, Math.min(0.022, pxDelta * 0.000115));
-            velocity += impulse;
-            velocity = Math.max(-0.065, Math.min(0.065, velocity));
-        }, { passive: false });
-
-        // 1:1 Pointer / Touch Dragging with Natural Release Momentum
-        viewport.addEventListener('pointerdown', (e) => {
-            if (isModalOpen() || e.target.closest('button, a, input, label, article, [role="button"], #theme-toggle, #case-study-modal')) return;
-            isDragging = true;
-            autoGlideTarget = null;
-            velocity = 0;
-            dragLastY = e.clientY;
-            dragLastTime = performance.now();
-            viewport.classList.add('is-dragging');
-        });
-
-        window.addEventListener('pointermove', (e) => {
-            if (!isDragging) return;
-            const now = performance.now();
-            const dy = dragLastY - e.clientY;
-            const dt = Math.max(8, now - dragLastTime);
-
-            // 1:1 direct displacement in viewport heights
-            const posDelta = dy / window.innerHeight;
-            currentPos += posDelta;
-
-            // Track instantaneous release velocity scaled to a 16.67ms frame
-            const instantVel = (posDelta / dt) * 16.67;
-            velocity = velocity * 0.35 + instantVel * 0.65;
-
-            dragLastY = e.clientY;
-            dragLastTime = now;
-        });
-
-        window.addEventListener('pointerup', () => {
-            if (!isDragging) return;
-            isDragging = false;
-            viewport.classList.remove('is-dragging');
-            // Clamp release momentum gently so coasting feels natural and effortless
-            velocity = Math.max(-0.055, Math.min(0.055, velocity));
-        });
-
-        window.addEventListener('pointercancel', () => {
-            isDragging = false;
-            viewport.classList.remove('is-dragging');
-        });
-
-        // Keyboard Up / Down & Left / Right Navigation
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeCaseStudy();
-                return;
+        function getScrollProgress() {
+            const scrollPosition = window.scrollY;
+            const firstPanelTop = getPanelTop(slidePanels[0]);
+            if (scrollPosition < firstPanelTop) {
+                const leadingTop = getPanelTop(leadingLoopClone);
+                const leadingHeight = firstPanelTop - leadingTop;
+                return 5 + Math.max(0, Math.min(1, (scrollPosition - leadingTop) / leadingHeight));
             }
-            if (isModalOpen()) return;
-            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') stepSlide(1);
-            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') stepSlide(-1);
-        });
 
-        // Main Delta-Time Inertial Physics Loop (Silk-Smooth, Zero Forced Snap)
-        function animateWheelLoop(now) {
-            const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
-            lastFrameTime = now;
-            const frameFactor = dt * 60;
-
-            if (!isDragging) {
-                if (autoGlideTarget !== null) {
-                    // Critically-damped smooth glide for explicit chapter button clicks
-                    const diff = autoGlideTarget - currentPos;
-                    currentPos += diff * (1 - Math.pow(0.91, frameFactor));
-                    if (Math.abs(diff) < 0.0008) {
-                        currentPos = autoGlideTarget;
-                        autoGlideTarget = null;
-                    }
-                } else if (Math.abs(velocity) > 0.00001) {
-                    // Pure velocity coasting with silky exponential friction (stops freely anywhere)
-                    currentPos += velocity * frameFactor;
-                    velocity *= Math.pow(0.925, frameFactor);
-                    if (Math.abs(velocity) < 0.00001) {
-                        velocity = 0;
-                    }
+            for (let i = 0; i < slidePanels.length - 1; i++) {
+                const start = getPanelTop(slidePanels[i]);
+                const end = getPanelTop(slidePanels[i + 1]);
+                if (scrollPosition < end) {
+                    return i + 1 + Math.max(0, Math.min(1, (scrollPosition - start) / (end - start)));
                 }
             }
+            const lastPanelTop = getPanelTop(slidePanels[slidePanels.length - 1]);
+            const trailingTop = getPanelTop(trailingLoopClone);
+            return 5 + Math.max(0, Math.min(1, (scrollPosition - lastPanelTop) / (trailingTop - lastPanelTop)));
+        }
 
-            // Seamless Infinite Loop Wrap across [0.5 .. 4.5] boundary
-            if (currentPos >= 4.5) {
-                currentPos -= 4.0;
-                if (autoGlideTarget !== null) autoGlideTarget -= 4.0;
-            } else if (currentPos < 0.5) {
-                currentPos += 4.0;
-                if (autoGlideTarget !== null) autoGlideTarget += 4.0;
+        function getScrollPosition(progress) {
+            let normalizedProgress = progress;
+            while (normalizedProgress < 0) normalizedProgress += slidePanels.length;
+            while (normalizedProgress > slidePanels.length + 1) normalizedProgress -= slidePanels.length;
+
+            if (normalizedProgress < 1) {
+                const leadingTop = getPanelTop(leadingLoopClone);
+                return leadingTop + (getPanelTop(slidePanels[0]) - leadingTop) * normalizedProgress;
             }
 
-            // Apply vertical translation to track
-            track.style.transform = `translate3d(0, ${-currentPos * 100}vh, 0)`;
-
-            // Subtle velocity-linked depth breath & vertical parallax on Roman watermarks
-            const effectiveVel = autoGlideTarget !== null
-                ? (autoGlideTarget - currentPos) * 0.06
-                : velocity;
-            const clampedVel = Math.max(-0.08, Math.min(0.08, effectiveVel));
-
-            slidePanels.forEach((panel, idx) => {
-                const dist = idx - currentPos;
-                if (Math.abs(dist) <= 1.5) {
-                    const scale = 1 - Math.min(0.018, Math.abs(clampedVel) * 0.22);
-                    panel.style.transform = `scale(${scale.toFixed(4)})`;
-                }
-            });
-
-            watermarks.forEach((wm, idx) => {
-                const dist = idx - currentPos;
-                if (Math.abs(dist) <= 1.5) {
-                    wm.style.transform = `translate3d(0, ${dist * 85}px, 0)`;
-                }
-            });
-
-            // Update continuous bottom gold progress bar (maps 1..5 -> 0%..300% of 25% bar)
-            let normalizedLoop = ((currentPos - 1) % 4 + 4) % 4; // 0.0 to 4.0
-            if (progressBar) {
-                progressBar.style.transform = `translateX(${normalizedLoop * 100}%)`;
+            if (normalizedProgress >= slidePanels.length) {
+                const lastPanelTop = getPanelTop(slidePanels[slidePanels.length - 1]);
+                const trailingTop = getPanelTop(trailingLoopClone);
+                return lastPanelTop + (trailingTop - lastPanelTop) * (normalizedProgress - slidePanels.length);
             }
 
-            // Determine nearest chapter (1..4) for indicators & soft background crossfade
-            let logicalSlide = Math.round(currentPos);
-            if (logicalSlide <= 0) logicalSlide += 4;
-            if (logicalSlide >= 5) logicalSlide -= 4;
+            const lowerIndex = Math.floor(normalizedProgress) - 1;
+            const fraction = normalizedProgress - Math.floor(normalizedProgress);
+            const lowerTop = getPanelTop(slidePanels[lowerIndex]);
+            if (fraction === 0) return lowerTop;
+            const upperTop = getPanelTop(slidePanels[lowerIndex + 1]);
+            return lowerTop + (upperTop - lowerTop) * fraction;
+        }
 
-            if (logicalSlide !== lastActiveLogical) {
-                lastActiveLogical = logicalSlide;
-                updateChapterIndicators(logicalSlide);
-            }
-
-            requestAnimationFrame(animateWheelLoop);
+        function getActiveSlide(progress) {
+            const roundedSlide = Math.round(progress);
+            return ((roundedSlide - 1) % slidePanels.length + slidePanels.length) % slidePanels.length + 1;
         }
 
         function updateChapterIndicators(activeSlide) {
-            document.querySelectorAll('.chapter-dot').forEach(btn => {
-                const idx = parseInt(btn.dataset.indicator, 10);
-                if (idx === activeSlide) {
-                    btn.classList.add('gold-text', 'font-bold');
-                    btn.classList.remove('opacity-55');
-                } else {
-                    btn.classList.remove('gold-text', 'font-bold');
-                    btn.classList.add('opacity-55');
-                }
-            });
+            wheelCurrent.textContent = romanNumerals[activeSlide - 1];
+            wheelNumberButton.setAttribute(
+                'aria-label',
+                `Current page ${romanNumerals[activeSlide - 1]}. Click to advance to the next page`
+            );
 
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < romanNumerals.length; i++) {
                 const layer = document.getElementById(`bg-photo-${i}`);
-                if (layer) {
-                    if (i === activeSlide - 1) {
-                        layer.classList.add('active');
-                    } else {
-                        layer.classList.remove('active');
-                    }
-                }
+                if (layer) layer.classList.toggle('active', i === activeSlide - 1);
             }
         }
 
-        requestAnimationFrame(animateWheelLoop);
+        function updateScrollState() {
+            const progress = getScrollProgress();
+            const activeSlide = getActiveSlide(progress);
+            updateChapterIndicators(activeSlide);
+            folioWheel.style.setProperty('--wheel-rotation', `${(progress - 1) * 72}deg`);
+            const numberAngle = progress <= slidePanels.length
+                ? 225 - (progress - 1) * 22.5
+                : 135 + (progress - slidePanels.length) * 90;
+            folioWheel.style.setProperty('--number-angle', `${numberAngle}deg`);
+        }
+
+        function snapToTarget(index) {
+            const targetPanel = slidePanels[index - 1];
+            if (targetPanel) targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function stepSlide(delta) {
+            const activeSlide = getActiveSlide(getScrollProgress());
+            const targetSlide = ((activeSlide - 1 + delta + slidePanels.length) % slidePanels.length) + 1;
+            if (delta > 0 && activeSlide === slidePanels.length) {
+                if (window.scrollY < getPanelTop(slidePanels[0])) {
+                    snapToTarget(1);
+                } else {
+                    window.scrollTo({ top: getPanelTop(trailingLoopClone), behavior: 'instant' });
+                }
+                return;
+            }
+            if (delta < 0 && activeSlide === 1) {
+                if (window.scrollY >= getPanelTop(slidePanels[slidePanels.length - 1])) {
+                    snapToTarget(slidePanels.length);
+                } else {
+                    window.scrollTo({ top: getPanelTop(leadingLoopClone), behavior: 'instant' });
+                }
+                return;
+            }
+            snapToTarget(targetSlide);
+        }
+
+        function getWheelAngle(clientX, clientY) {
+            const rect = folioWheel.getBoundingClientRect();
+            return Math.atan2(clientY - (rect.top + rect.height / 2), clientX - (rect.left + rect.width / 2));
+        }
+
+        folioWheel.addEventListener('pointerdown', (e) => {
+            if (isModalOpen()) return;
+            if (!e.target.closest('#wheel-number-button')) e.preventDefault();
+            isWheelDragging = true;
+            wheelPointerMoved = false;
+            wheelDragStartX = e.clientX;
+            wheelDragStartY = e.clientY;
+            wheelDragLastAngle = getWheelAngle(e.clientX, e.clientY);
+            wheelDragProgress = getScrollProgress();
+            folioWheel.classList.add('is-moving');
+        });
+
+        wheelNumberButton.addEventListener('click', () => {
+            if (suppressWheelClick) {
+                suppressWheelClick = false;
+                return;
+            }
+            stepSlide(1);
+        });
+
+        initScrollReveals();
+
+        window.addEventListener('scroll', () => {
+            const firstPanelTop = getPanelTop(slidePanels[0]);
+            const scrollPosition = window.scrollY;
+            if (scrollPosition < firstPanelTop) {
+                const offset = scrollPosition - getPanelTop(leadingLoopClone);
+                const wrappedPosition = getPanelTop(slidePanels[slidePanels.length - 1]) + offset;
+                lastScrollY = wrappedPosition;
+                window.scrollTo({
+                    top: wrappedPosition,
+                    behavior: 'instant'
+                });
+                return;
+            }
+
+            const trailingTop = getPanelTop(trailingLoopClone);
+            if (scrollPosition >= trailingTop - 1) {
+                const offset = Math.max(0, scrollPosition - trailingTop);
+                const wrappedPosition = firstPanelTop + offset;
+                lastScrollY = wrappedPosition;
+                window.scrollTo({ top: wrappedPosition, behavior: 'instant' });
+                return;
+            }
+
+            if (scrollPosition !== lastScrollY) {
+                scrollDirection = scrollPosition > lastScrollY ? 'down' : 'up';
+                lastScrollY = scrollPosition;
+            }
+            updateScrollState();
+            folioWheel.classList.add('is-moving');
+            window.clearTimeout(scrollIdleTimer);
+            scrollIdleTimer = window.setTimeout(() => folioWheel.classList.remove('is-moving'), 180);
+        }, { passive: true });
+
+        window.addEventListener('resize', updateScrollState);
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isWheelDragging) return;
+            if (Math.hypot(e.clientX - wheelDragStartX, e.clientY - wheelDragStartY) > 3) {
+                wheelPointerMoved = true;
+            }
+            let angleDelta = getWheelAngle(e.clientX, e.clientY) - wheelDragLastAngle;
+            if (angleDelta > Math.PI) angleDelta -= Math.PI * 2;
+            if (angleDelta < -Math.PI) angleDelta += Math.PI * 2;
+
+            wheelDragProgress += angleDelta * slidePanels.length / (Math.PI * 2);
+            window.scrollTo({ top: getScrollPosition(wheelDragProgress), behavior: 'auto' });
+            wheelDragLastAngle = getWheelAngle(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (wheelPointerMoved) {
+                suppressWheelClick = true;
+                window.setTimeout(() => { suppressWheelClick = false; }, 0);
+            }
+            isWheelDragging = false;
+            window.clearTimeout(scrollIdleTimer);
+            scrollIdleTimer = window.setTimeout(() => folioWheel.classList.remove('is-moving'), 180);
+        });
+
+        window.addEventListener('pointercancel', () => {
+            isWheelDragging = false;
+            folioWheel.classList.remove('is-moving');
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCaseStudy();
+                closeShareModal();
+                return;
+            }
+            if (isModalOpen()) return;
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                stepSlide(1);
+            }
+            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                stepSlide(-1);
+            }
+        });
+
+        lastScrollY = getPanelTop(slidePanels[0]);
+        window.scrollTo({ top: lastScrollY, behavior: 'instant' });
+        updateScrollState();
 
         /* =====================================================================
            2. 3D CARDBOARD DIE-CUT PORTRAIT ENGINE (CANVAS BACKGROUND REMOVAL)
            ===================================================================== */
         const mainCanvas = document.getElementById('cutout-canvas');
-        const cloneCanvas = document.getElementById('cutout-canvas-clone');
 
         function renderCardboardCutout(img) {
             const targetW = 420;
             const targetH = 540;
 
-            [mainCanvas, cloneCanvas].forEach(canvas => {
+            [mainCanvas, ...document.querySelectorAll('.loop-clone .cutout-canvas-el')].forEach(canvas => {
                 if (!canvas) return;
                 canvas.width = targetW;
                 canvas.height = targetH;
                 const ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, targetW, targetH);
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
 
-                // Fit portrait proportionally inside canvas with margin for die-cut border
-                const pad = 22;
+                // Keep the PNG alpha channel intact and blend it gently into the page.
+                const pad = 12;
                 const availW = targetW - pad * 2;
                 const availH = targetH - pad;
                 const scale = Math.min(availW / img.width, availH / img.height);
@@ -1190,107 +1589,33 @@
                 const offsetX = (targetW - drawW) / 2;
                 const offsetY = targetH - drawH;
 
-                // Offscreen mask canvas to key out outer white studio background
-                const maskCanvas = document.createElement('canvas');
-                maskCanvas.width = targetW;
-                maskCanvas.height = targetH;
-                const mCtx = maskCanvas.getContext('2d');
-                mCtx.drawImage(img, offsetX, offsetY, drawW, drawH);
+                const portraitCanvas = document.createElement('canvas');
+                portraitCanvas.width = targetW;
+                portraitCanvas.height = targetH;
+                const portraitCtx = portraitCanvas.getContext('2d');
+                portraitCtx.drawImage(img, offsetX, offsetY, drawW, drawH);
 
                 try {
-                    const imgData = mCtx.getImageData(0, 0, targetW, targetH);
-                    const data = imgData.data;
-
-                    // Flood-fill from outer top, left, and right edges so white shirt collar stays intact
-                    const visited = new Uint8Array(targetW * targetH);
-                    const queue = new Int32Array(targetW * targetH);
-                    let head = 0, tail = 0;
-
-                    function isNearWhite(idx) {
-                        const r = data[idx];
-                        const g = data[idx + 1];
-                        const b = data[idx + 2];
-                        return r > 224 && g > 224 && b > 224 && Math.abs(r - g) < 18 && Math.abs(g - b) < 18;
-                    }
-
-                    for (let x = 0; x < targetW; x++) {
-                        if (isNearWhite(x * 4)) {
-                            visited[x] = 1;
-                            queue[tail++] = x;
+                    const pixels = portraitCtx.getImageData(0, 0, targetW, targetH);
+                    const data = pixels.data;
+                    for (let i = 0; i < data.length; i += 4) {
+                        if (data[i + 3] < 38) {
+                            data[i + 3] = 0;
+                        } else if (data[i + 3] < 160) {
+                            data[i + 3] = Math.round(data[i + 3] * 0.72);
                         }
                     }
-                    for (let y = 0; y < targetH; y++) {
-                        const leftIdx = y * targetW;
-                        const rightIdx = y * targetW + (targetW - 1);
-                        if (!visited[leftIdx] && isNearWhite(leftIdx * 4)) {
-                            visited[leftIdx] = 1;
-                            queue[tail++] = leftIdx;
-                        }
-                        if (!visited[rightIdx] && isNearWhite(rightIdx * 4)) {
-                            visited[rightIdx] = 1;
-                            queue[tail++] = rightIdx;
-                        }
-                    }
-
-                    while (head < tail) {
-                        const curr = queue[head++];
-                        const cx = curr % targetW;
-                        const cy = (curr - cx) / targetW;
-                        data[curr * 4 + 3] = 0;
-
-                        const neighbors = [
-                            cx > 0 ? curr - 1 : -1,
-                            cx < targetW - 1 ? curr + 1 : -1,
-                            cy > 0 ? curr - targetW : -1,
-                            cy < targetH - 1 ? curr + targetW : -1
-                        ];
-
-                        for (let n = 0; n < 4; n++) {
-                            const next = neighbors[n];
-                            if (next !== -1 && !visited[next]) {
-                                visited[next] = 1;
-                                if (isNearWhite(next * 4)) {
-                                    queue[tail++] = next;
-                                } else {
-                                    const p = next * 4;
-                                    const lum = (data[p] + data[p + 1] + data[p + 2]) / 3;
-                                    if (lum > 205) {
-                                        data[p + 3] = Math.max(0, Math.min(255, (245 - lum) * 6));
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    mCtx.putImageData(imgData, 0, 0);
+                    portraitCtx.putImageData(pixels, 0, 0);
                 } catch (err) {
-                    // Graceful fallback if cross-origin canvas is tainted
+                    // The original PNG remains usable if canvas pixel access is unavailable.
                 }
 
-                // Create crisp white cardboard die-cut rim around silhouette
-                const rimCanvas = document.createElement('canvas');
-                rimCanvas.width = targetW;
-                rimCanvas.height = targetH;
-                const rCtx = rimCanvas.getContext('2d');
-                rCtx.drawImage(maskCanvas, 0, 0);
-                rCtx.globalCompositeOperation = 'source-in';
-                rCtx.fillStyle = '#FFFFFF';
-                rCtx.fillRect(0, 0, targetW, targetH);
-
-                const borderThickness = 9;
-                for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 12) {
-                    const dx = Math.cos(angle) * borderThickness;
-                    const dy = Math.sin(angle) * borderThickness;
-                    ctx.drawImage(rimCanvas, dx, dy);
-                }
-
-                // Composite keyed portrait cleanly atop cardboard backing
-                ctx.drawImage(maskCanvas, 0, 0);
+                ctx.drawImage(portraitCanvas, 0, 0);
             });
         }
 
         function initPortraitCutout() {
-            const sourcePaths = ['Canva - download.jpg', './Canva - download.jpg'];
+            const sourcePaths = ['Canva - download-Photoroom.png', './Canva - download-Photoroom.png'];
             let attempt = 0;
 
             function tryNext() {
@@ -1311,21 +1636,6 @@
             }
 
             tryNext();
-        }
-
-        function handlePortraitUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    renderCardboardCutout(img);
-                    showToast('3D Cardboard Portrait Updated');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
         }
 
         // Interactive 3D Cursor Tilt & Shadow Depth on Portrait Cutout Stage
@@ -1360,7 +1670,7 @@
         initPortraitCutout();
 
         /* =====================================================================
-           3. THEME TOGGLE (ALABASTER WHITE <-> MATTE OBSIDIAN BLACK)
+           3. THEME TOGGLE (WARM PARCHMENT <-> MATTE OBSIDIAN BLACK)
            ===================================================================== */
         function applyTheme(mode) {
             const html = document.documentElement;
@@ -1388,7 +1698,11 @@
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme') || (html.classList.contains('dark') ? 'dark' : 'light');
             const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(nextTheme);
+            if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.startViewTransition(() => applyTheme(nextTheme));
+            } else {
+                applyTheme(nextTheme);
+            }
             try {
                 localStorage.setItem('bosenghour_chronicle_theme', nextTheme);
             } catch (err) {}
@@ -1408,38 +1722,38 @@
             flamelens: {
                 folio: 'FOLIO 01  •  NASA SPACE APPS CHALLENGE',
                 title: 'FlameLens',
-                subtitle: 'AI-Powered Microgravity Fire Safety Engine',
-                description: 'In microgravity habitats, the absence of buoyant convection fundamentally alters flame spread and ignition behavior. FlameLens indexes experimental records from NASA’s Physical Sciences Informatics (PSI) datasets—spanning BASS, FLEX, and ACME—into a relational SQLite engine paired with Gemini AI synthesis for verifiable lunar habitat safety evaluations.',
+                subtitle: 'SI-Powered Microgravity Fire Safety Engine',
+                description: 'In microgravity habitats, the absence of buoyant convection fundamentally alters flame spread and ignition behavior. FlameLens indexes experimental records from NASA’s Physical Sciences Informatics (PSI) datasets—spanning BASS, FLEX, and ACME—into a relational SQLite engine, with Claude on Amazon Bedrock supporting verifiable lunar-habitat safety evaluations.',
                 bullets: [
                     'Normalized multi-experiment NASA PSI datasets (BASS, FLEX, ACME) into structured local SQLite tables.',
-                    'Engineered deterministic parameter retrieval so Gemini AI hazard assessments cite verifiable experimental ignition metrics.',
+                    'Connected Claude through Amazon Bedrock to support hazard assessments grounded in verifiable experimental ignition metrics.',
                     'Designed for local offline execution and rapid scientific cross-referencing.'
                 ],
-                tech: 'Python  •  SQLite  •  NASA PSI Datasets  •  Gemini AI'
+                tech: 'Python  •  SQLite  •  NASA PSI Datasets  •  Claude  •  Amazon Bedrock'
             },
             dse: {
-                folio: 'FOLIO 02  •  CROSS-BORDER PRODUCTION & VECTOR SYSTEMS',
-                title: 'DSE Apparel & Supply Pipeline',
-                subtitle: 'Royal University of Phnom Penh — Cohort Operations',
-                description: 'Directed end-to-end technical apparel vectorization, 1688 supplier coordination, cohort sizing validation, and cross-border freight logistics from Guangzhou manufacturing partners to Phnom Penh campus delivery.',
+                folio: 'FOLIO 02  •  CUSTOMER SERVICE & EVENT OPERATIONS',
+                title: 'Cozy Corner Event Operator',
+                subtitle: 'Halloween Event — Borey Peng Huoth Boeung Snor',
+                description: 'Supported guest service and on-site event operations for Cozy Corner from October to November 2026, maintaining responsive communication and a reliable service experience throughout the Halloween event.',
                 bullets: [
-                    'Authored print-ready vector schematics and embroidery placement tolerances.',
-                    'Validated cohort order datasets to eliminate sizing discrepancies across bulk production.',
-                    'Managed supplier verification and Guangzhou-to-Phnom Penh freight milestones.'
+                    'Resolved customer questions and handled immediate service needs.',
+                    'Maintained orderly operations and streamlined guest-facing workflows.',
+                    'Worked collaboratively with event staff in a fast-moving environment.'
                 ],
-                tech: 'Vector Systems  •  1688 Sourcing  •  Cross-Border Logistics'
+                tech: 'Customer Service  •  Event Operations  •  Teamwork'
             },
-            esp32: {
-                folio: 'FOLIO 03  •  EMBEDDED EDGE DATA ACQUISITION',
-                title: 'ESP32 Telemetry Node',
-                subtitle: 'Hardware-to-Database Edge Logging Prototype',
-                description: 'An embedded edge acquisition prototype built on the Type-C ESP32 platform for deterministic GPIO sensor mapping, structured serial telemetry framing, and automated ingestion into local SQLite storage.',
+            iot: {
+                folio: 'FOLIO 03  •  INTERNET OF THINGS',
+                title: 'IoT',
+                subtitle: 'ESP32 Sensor Prototype',
+                description: 'A simple Internet of Things prototype using an ESP32 development board to connect sensors and log readings.',
                 bullets: [
-                    'Mapped multi-channel GPIO sensor interfaces with deterministic polling intervals.',
-                    'Implemented structured packet framing for direct ingestion into local SQLite time-series tables.',
-                    'Validated signal stability and serial throughput under continuous bench operation.'
+                    'Uses an ESP32 board for connected sensor projects.',
+                    'Collects and records readings for basic monitoring.',
+                    'Demonstrates a straightforward IoT hardware workflow.'
                 ],
-                tech: 'Type-C ESP32  •  GPIO Mapping  •  SQLite Logging'
+                tech: 'IoT  •  ESP32  •  Sensors'
             }
         };
 
@@ -1466,8 +1780,83 @@
             modal.classList.remove('flex');
         }
 
+        function getPortfolioShareUrl() {
+            if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
+                const canonicalLink = document.querySelector('link[rel="canonical"]');
+                if (canonicalLink) return canonicalLink.href;
+            }
+            const url = new URL(window.location.href);
+            url.hash = '';
+            return url.toString();
+        }
+
+        function openShareModal() {
+            const shareUrl = getPortfolioShareUrl();
+            const qrContainer = document.getElementById('share-qr-code');
+            const status = document.getElementById('share-status');
+            document.getElementById('share-url').value = shareUrl;
+            qrContainer.replaceChildren();
+
+            if (typeof QRCode === 'undefined') {
+                status.textContent = 'QR code unavailable. You can still copy the link below.';
+            } else {
+                new QRCode(qrContainer, {
+                    text: shareUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#171512',
+                    colorLight: '#FFFFFF',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+                status.textContent = window.location.protocol === 'file:'
+                    ? 'This is the live portfolio URL to use after publishing.'
+                    : 'Scan to open the portfolio.';
+            }
+
+            const modal = document.getElementById('share-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('share-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function copyPortfolioLink() {
+            const input = document.getElementById('share-url');
+            const status = document.getElementById('share-status');
+            const copyFromSelection = () => {
+                try {
+                    input.focus();
+                    input.select();
+                    return document.execCommand('copy');
+                } catch (error) {
+                    return false;
+                }
+            };
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(input.value);
+                } else if (!copyFromSelection()) {
+                    throw new Error('Clipboard access is unavailable.');
+                }
+                status.textContent = 'Portfolio link copied to clipboard.';
+                showToast('Portfolio link copied');
+            } catch (error) {
+                if (copyFromSelection()) {
+                    status.textContent = 'Portfolio link copied to clipboard.';
+                    showToast('Portfolio link copied');
+                    return;
+                }
+                status.textContent = 'Could not copy automatically. The link is selected for you to copy manually.';
+            }
+        }
+
         function copyEmailAddress() {
-            const email = 'bosenghour@example.com';
+            const email = 'senghour.appleid@gmail.com';
             const temp = document.createElement('input');
             temp.value = email;
             document.body.appendChild(temp);
