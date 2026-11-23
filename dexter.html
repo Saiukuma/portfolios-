@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bo Senghour — Data Science &amp; Engineering Chronicle</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Classic Roman & Broadsheet Newspaper Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        roman: ['"Cinzel"', 'Georgia', 'serif'],
+                        broadsheet: ['"Playfair Display"', 'Georgia', 'serif'],
+                        editorial: ['"Newsreader"', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* =====================================================================
+           1. THEME VARIABLES (ALABASTER WHITE & MATTE OBSIDIAN BLACK)
+           ===================================================================== */
+        :root,
+        [data-theme="light"] {
+            --bg-primary: #FAF9F6;
+            --bg-solid: #FAF9F6;
+            --bg-surface: rgba(255, 255, 255, 0.86);
+            --text-primary: #18181B;
+            --text-secondary: #3F3F46;
+            --text-muted: #71717A;
+            --accent-gold: #B49252;
+            --gold-highlight-bg: rgba(180, 146, 82, 0.2);
+            --border-hairline: rgba(24, 24, 27, 0.14);
+            --border-subtle: rgba(24, 24, 27, 0.1);
+            --watermark-color: rgba(180, 146, 82, 0.085);
+            --cutout-shadow: rgba(24, 24, 27, 0.24);
+            --gentle-ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        html.dark,
+        [data-theme="dark"] {
+            --bg-primary: #0D0D0F;
+            --bg-solid: #0D0D0F;
+            --bg-surface: rgba(24, 24, 28, 0.84);
+            --text-primary: #F4F4F5;
+            --text-secondary: #D4D4D8;
+            --text-muted: #A1A1AA;
+            --accent-gold: #D4AF37;
+            --gold-highlight-bg: rgba(212, 175, 55, 0.22);
+            --border-hairline: rgba(244, 244, 245, 0.14);
+            --border-subtle: rgba(244, 244, 245, 0.1);
+            --watermark-color: rgba(212, 175, 55, 0.075);
+            --cutout-shadow: rgba(0, 0, 0, 0.65);
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden !important;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Newsreader', Georgia, serif;
+            transition: background-color 0.85s var(--gentle-ease), color 0.85s var(--gentle-ease);
+        }
+
+        .gold-text {
+            color: var(--accent-gold);
+        }
+
+        .gold-border {
+            border-color: var(--accent-gold);
+        }
+
+        .hairline-border {
+            border-color: var(--border-hairline);
+        }
+
+        .gold-highlight {
+            background: linear-gradient(180deg, transparent 52%, var(--gold-highlight-bg) 52%);
+            color: inherit;
+            padding: 0 0.18em;
+            border-radius: 1px;
+        }
+
+        .broadsheet-rule-double {
+            height: 4px;
+            border-top: 1px solid var(--border-hairline);
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .drop-cap::first-letter {
+            float: left;
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 2.85rem;
+            line-height: 0.85;
+            padding-right: 0.55rem;
+            padding-top: 0.15rem;
+            color: var(--accent-gold);
+        }
+
+        /* =====================================================================
+           2. ATMOSPHERIC PHOTOGRAPHIC BACKDROP LAYERS
+           ===================================================================== */
+        .bg-photo-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            filter: grayscale(100%) contrast(105%);
+            pointer-events: none;
+            transition: opacity 1.35s var(--gentle-ease);
+        }
+
+        .bg-photo-layer.active {
+            opacity: 0.075;
+        }
+
+        html.dark .bg-photo-layer.active,
+        [data-theme="dark"] .bg-photo-layer.active {
+            opacity: 0.095;
+        }
+
+        .paper-vignette {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 42%, var(--bg-primary) 100%);
+            transition: background 0.85s var(--gentle-ease);
+        }
+
+        /* =====================================================================
+           3. CONTINUOUS INERTIA VERTICAL WHEEL TRACK & SEAM BRIDGES
+           ===================================================================== */
+        #carousel-viewport {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden !important;
+            cursor: grab;
+        }
+
+        #carousel-viewport.is-dragging {
+            cursor: grabbing;
+        }
+
+        #carousel-track {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 600vh; /* 4 real slides + 2 edge clones for seamless infinite vertical wrap */
+            will-change: transform;
+        }
+
+        .slide-panel {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            overflow: hidden !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4.8rem 1.75rem 4.2rem 2.75rem;
+            will-change: transform;
+        }
+
+        @media (min-width: 768px) {
+            .slide-panel {
+                padding: 5rem 4.5rem 4.5rem 5.5rem;
+            }
+        }
+
+        /* Continuous Vertical Brushed-Gold Meridian Spine Spanning All 600vh */
+        .continuous-gold-meridian {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 20px;
+            width: 1px;
+            background: repeating-linear-gradient(
+                180deg,
+                var(--accent-gold) 0px,
+                var(--accent-gold) 6px,
+                transparent 6px,
+                transparent 12px
+            );
+            opacity: 0.36;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        @media (min-width: 768px) {
+            .continuous-gold-meridian {
+                left: 48px;
+            }
+        }
+
+        /* Horizontal Seam Bridge Rules & Centered Roman Medallions at 100vh Seams */
+        .seam-bridge-line {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            transform: translateY(-50%);
+            background: linear-gradient(
+                90deg,
+                var(--accent-gold) 0%,
+                var(--border-subtle) 35%,
+                var(--border-subtle) 65%,
+                var(--accent-gold) 100%
+            );
+            opacity: 0.48;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        @media (min-width: 768px) {
+            .seam-bridge-line {
+                left: 48px;
+                right: 48px;
+            }
+        }
+
+        .seam-bridge-medallion {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 9999px;
+            border: 1px solid var(--accent-gold);
+            background-color: var(--bg-solid);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 16;
+            pointer-events: none;
+            box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.15);
+            transition: background-color 1.1s var(--gentle-ease), border-color 1.1s var(--gentle-ease);
+        }
+
+        .seam-bridge-medallion::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 9999px;
+            border: 1px dashed var(--accent-gold);
+            opacity: 0.55;
+        }
+
+        /* Oversized Parallax Roman Numeral Watermarks */
+        .roman-watermark {
+            position: absolute;
+            right: 5vw;
+            bottom: 7vh;
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: clamp(10rem, 22vw, 22rem);
+            line-height: 0.8;
+            color: var(--watermark-color);
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+            will-change: transform;
+            transition: color 1.1s var(--gentle-ease);
+        }
+
+        /* =====================================================================
+           4. EDITORIAL CARDS & GENTLE INTERACTIONS
+           ===================================================================== */
+        .editorial-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-hairline);
+            backdrop-filter: blur(8px);
+            transition: transform 0.9s var(--gentle-ease), border-color 0.9s var(--gentle-ease), box-shadow 0.9s var(--gentle-ease), background-color 1.1s var(--gentle-ease);
+        }
+
+        .editorial-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 18px 36px -18px rgba(0, 0, 0, 0.16);
+        }
+
+        .editorial-card img {
+            filter: grayscale(85%) sepia(12%) contrast(103%);
+            transition: transform 1.4s var(--gentle-ease), filter 1.2s var(--gentle-ease);
+        }
+
+        .editorial-card:hover img {
+            transform: scale(1.035);
+            filter: grayscale(20%) sepia(6%) contrast(104%);
+        }
+
+        /* =====================================================================
+           5. SLIDE I — 3D CARDBOARD POP-OUT PORTRAIT STAGE
+           ===================================================================== */
+        .cutout-stage {
+            position: relative;
+            width: 100%;
+            min-height: 310px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1100px;
+        }
+
+        @media (min-width: 768px) {
+            .cutout-stage {
+                min-height: 410px;
+            }
+        }
+
+        /* Monumental Roman Backdrop Typography (z-index: 10) */
+        .backdrop-monument-text {
+            position: absolute;
+            z-index: 10;
+            text-align: center;
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            line-height: 0.93;
+            font-size: clamp(2.2rem, 4.8vw, 4.1rem);
+            color: var(--text-primary);
+            opacity: 0.17;
+            user-select: none;
+            pointer-events: none;
+            transition: color 1.1s var(--gentle-ease), transform 0.8s var(--gentle-ease);
+        }
+
+        /* Die-Cut 3D Cardboard Portrait Wrapper (z-index: 20) */
+        .cardboard-3d-wrapper {
+            position: relative;
+            z-index: 20;
+            transform-style: preserve-3d;
+            transition: transform 0.7s var(--gentle-ease);
+            animation: gentleFloat 7.5s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
+            50% { transform: translateY(-6px) rotateX(1deg) rotateY(-1deg); }
+        }
+
+        .cutout-canvas-el {
+            display: block;
+            max-width: 235px;
+            max-height: 300px;
+            width: auto;
+            height: auto;
+            filter: drop-shadow(0 20px 24px var(--cutout-shadow));
+            transition: filter 1.1s var(--gentle-ease);
+        }
+
+        @media (min-width: 768px) {
+            .cutout-canvas-el {
+                max-width: 295px;
+                max-height: 380px;
+            }
+        }
+
+        /* Architectural Pedestal Under Cutout */
+        .cutout-pedestal {
+            position: relative;
+            z-index: 15;
+            width: 195px;
+            height: 9px;
+            margin-top: -3px;
+            border: 1px solid var(--accent-gold);
+            background-color: var(--bg-solid);
+            box-shadow: 0 10px 22px -6px var(--cutout-shadow);
+            transition: background-color 1.1s var(--gentle-ease), border-color 1.1s var(--gentle-ease);
+        }
+
+        /* Theme Toggle Pill */
+        .theme-pill {
+            position: relative;
+            z-index: 9999;
+            pointer-events: auto;
+            cursor: pointer;
+            border: 1px solid var(--border-hairline);
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
+            backdrop-filter: blur(8px);
+            transition: border-color 0.8s var(--gentle-ease), background-color 0.85s var(--gentle-ease), color 0.85s var(--gentle-ease);
+        }
+
+        .theme-pill:hover {
+            border-color: var(--accent-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Persistent Dimmed Architectural Photographic Background Layers (Crossfade Per Slide) -->
+    <div id="bg-photo-0" class="bg-photo-layer active" style="background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1800&q=75');"></div>
+    <div id="bg-photo-1" class="bg-photo-layer" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1800&q=75');"></div>
+    <div id="bg-photo-2" class="bg-photo-layer" style="background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1800&q=75');"></div>
+    <div id="bg-photo-3" class="bg-photo-layer" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1800&q=75');"></div>
+    <div class="paper-vignette"></div>
+
+    <!-- =====================================================================
+         MINIMAL BROADSHEET MASTHEAD (NO NAVIGATION TABS)
+         ===================================================================== -->
+    <header style="z-index: 1000; pointer-events: auto;" class="fixed top-0 left-0 right-0 px-6 sm:px-12 pt-3.5 pb-2">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between gap-4 pb-2">
+                <!-- Left Edition Dateline -->
+                <div class="flex items-center gap-2.5 text-[10px] sm:text-xs font-roman tracking-[0.2em] uppercase" style="color: var(--text-muted);">
+                    <span class="gold-text font-semibold">Phnom Penh</span>
+                    <span>&bull;</span>
+                    <span>Edition MMXXVI</span>
+                </div>
+
+                <!-- Center Engraved Masthead -->
+                <button type="button" onclick="snapToTarget(1)" class="font-roman text-base sm:text-xl tracking-[0.18em] font-semibold uppercase cursor-pointer focus:outline-none">
+                    Bo Senghour<span class="gold-text">.</span>
+                </button>
+
+                <!-- Right Theme Toggle Pill -->
+                <button id="theme-toggle" type="button" onclick="toggleTheme(event)" class="theme-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs" aria-label="Toggle Light and Dark Theme">
+                    <i data-lucide="moon" id="icon-moon" class="w-3.5 h-3.5 gold-text pointer-events-none"></i>
+                    <i data-lucide="sun" id="icon-sun" class="w-3.5 h-3.5 gold-text hidden pointer-events-none"></i>
+                    <span id="theme-label" class="font-roman text-[10px] tracking-[0.18em] uppercase font-medium pointer-events-none">Obsidian</span>
+                </button>
+            </div>
+            <div class="broadsheet-rule-double w-full"></div>
+        </div>
+    </header>
+
+    <!-- =====================================================================
+         MAIN FULL-VIEWPORT CONTINUOUS INERTIA VERTICAL WHEEL CAROUSEL
+         ===================================================================== -->
+    <main id="carousel-viewport">
+        <div id="carousel-track">
+
+            <!-- Continuous Vertical Gold Meridian Spine Spanning All Slides -->
+            <div class="continuous-gold-meridian"></div>
+
+            <!-- Horizontal Seam Bridge Rules & Roman Compass Medallions on Every 100vh Seam -->
+            <div class="seam-bridge-line" style="top: 100vh;" aria-hidden="true">
+                <div class="seam-bridge-medallion">
+                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="seam-bridge-line" style="top: 200vh;" aria-hidden="true">
+                <div class="seam-bridge-medallion">
+                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="seam-bridge-line" style="top: 300vh;" aria-hidden="true">
+                <div class="seam-bridge-medallion">
+                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="seam-bridge-line" style="top: 400vh;" aria-hidden="true">
+                <div class="seam-bridge-medallion">
+                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="seam-bridge-line" style="top: 500vh;" aria-hidden="true">
+                <div class="seam-bridge-medallion">
+                    <svg class="w-4 h-4 gold-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                        <polygon points="12 2 14.5 9.5 22 12 14.5 14.5 12 22 9.5 14.5 2 12 9.5 9.5 12 2"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- =================================================================
+                 CLONE OF SLIDE IV (Index 0 — Enables Seamless Upward Loop)
+                 ================================================================= -->
+            <section class="slide-panel" data-panel="0" aria-hidden="true">
+                <div class="roman-watermark" data-watermark="0">IV</div>
+                <div class="max-w-6xl w-full mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-6 space-y-5">
+                        <p class="font-roman text-xs tracking-[0.25em] uppercase gold-text">Section IV &mdash; Correspondence</p>
+                        <h2 class="font-broadsheet text-3xl sm:text-5xl font-normal leading-tight">
+                            Initiate an <mark class="gold-highlight italic">Editorial Inquiry</mark> or Research Dialogue.
+                        </h2>
+                        <p class="drop-cap text-base sm:text-lg leading-relaxed" style="color: var(--text-secondary);">
+                            Available in Phnom Penh and remotely for data engineering collaborations, scientific dataset indexing, hackathon teams, and applied intelligence systems.
+                        </p>
+                    </div>
+                    <div class="lg:col-span-6">
+                        <div class="editorial-card p-7 rounded-sm space-y-4">
+                            <p class="font-roman text-xs tracking-[0.2em] uppercase" style="color: var(--text-muted);">Direct Electronic Telegraph</p>
+                            <p class="font-broadsheet text-2xl sm:text-3xl">bosenghour@example.com</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 SLIDE I: COVER & 3D CARDBOARD POP-OUT PORTRAIT (Index 1)
+                 ================================================================= -->
+            <section class="slide-panel" data-panel="1">
+                <div class="roman-watermark" data-watermark="1">I</div>
+
+                <div class="max-w-6xl w-full mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
+                    
+                    <!-- Left Broadsheet Column -->
+                    <div class="lg:col-span-7 space-y-5 order-2 lg:order-1">
+                        <div class="space-y-2">
+                            <p class="font-roman text-xs tracking-[0.26em] uppercase gold-text font-medium">
+                                Section I &mdash; Data Science &amp; Engineering
+                            </p>
+                            <h1 class="font-broadsheet text-3xl sm:text-5xl lg:text-[3.25rem] font-normal leading-[1.12] tracking-tight">
+                                Engineering <mark class="gold-highlight italic">resilient data pipelines</mark> &amp; applied intelligence.
+                            </h1>
+                        </div>
+
+                        <div class="w-16 h-[1px]" style="background-color: var(--accent-gold);"></div>
+
+                        <p class="drop-cap text-base sm:text-lg leading-relaxed max-w-xl" style="color: var(--text-secondary);">
+                            Undergraduate scholar in Data Science &amp; Engineering at the Royal University of Phnom Penh. Specializing in scientific combustion datasets, deterministic retrieval architectures, and embedded telemetry.
+                        </p>
+
+                        <div class="pt-1 flex flex-wrap items-center gap-5">
+                            <button onclick="stepSlide(1)" class="inline-flex items-center gap-3 px-6 py-2.5 rounded-sm font-roman text-xs tracking-[0.2em] uppercase border gold-border transition-opacity hover:opacity-85 cursor-pointer" style="background-color: var(--text-primary); color: var(--bg-primary);">
+                                <span>Examine Selected Works</span>
+                                <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                            </button>
+
+                            <span class="text-xs italic" style="color: var(--text-muted);">
+                                Scroll mouse wheel or drag vertically to turn folios &darr;
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: 3D Cardboard Pop-Out Portrait Over Monumental Text -->
+                    <div class="lg:col-span-5 flex flex-col items-center justify-center order-1 lg:order-2">
+                        <div id="cutout-stage" class="cutout-stage">
+                            <!-- Layer 1 (z-index: 10): Monumental Roman Backdrop Typography -->
+                            <div id="backdrop-text" class="backdrop-monument-text" aria-hidden="true">
+                                BO<br>SENG<br>HOUR
+                            </div>
+
+                            <!-- Layer 2 (z-index: 20): Background-Free 3D Die-Cut Cardboard Portrait -->
+                            <div id="cardboard-3d" class="cardboard-3d-wrapper">
+                                <canvas id="cutout-canvas" class="cutout-canvas-el" width="420" height="540" aria-label="3D Cardboard Cutout Portrait of Bo Senghour"></canvas>
+                            </div>
+
+                            <!-- Layer 3 (z-index: 15): Architectural Pedestal -->
+                            <div class="cutout-pedestal"></div>
+                        </div>
+
+                        <!-- Discreet Portrait File Selector -->
+                        <div class="mt-2.5 flex items-center gap-2.5 text-[10px] font-roman tracking-[0.18em] uppercase" style="color: var(--text-muted);">
+                            <span>Fig. I &mdash; Portrait Cutout</span>
+                            <span>&bull;</span>
+                            <label for="portrait-file-input" class="gold-text underline cursor-pointer hover:opacity-80">
+                                Replace Portrait
+                            </label>
+                            <input id="portrait-file-input" type="file" accept="image/*" class="hidden" onchange="handlePortraitUpload(event)">
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 SLIDE II: SELECTED WORKS BROADSHEET INDEX (Index 2)
+                 ================================================================= -->
+            <section class="slide-panel" data-panel="2">
+                <div class="roman-watermark" data-watermark="2">II</div>
+
+                <div class="max-w-6xl w-full mx-auto relative z-10 space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b hairline-border pb-3.5">
+                        <div>
+                            <p class="font-roman text-xs tracking-[0.26em] uppercase gold-text font-medium mb-1">
+                                Section II &mdash; Archival Folio
+                            </p>
+                            <h2 class="font-broadsheet text-2xl sm:text-4xl font-normal">
+                                Selected <mark class="gold-highlight italic">Engineering</mark> &amp; Research Works
+                            </h2>
+                        </div>
+                        <p class="text-xs italic" style="color: var(--text-muted);">
+                            Select any dispatch to inspect full architectural dossier
+                        </p>
+                    </div>
+
+                    <!-- Three Broadsheet Cards with Architectural/Technical Thumbnails -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        
+                        <!-- 01. FlameLens -->
+                        <article onclick="openCaseStudy('flamelens')" class="editorial-card rounded-sm overflow-hidden flex flex-col justify-between cursor-pointer group">
+                            <div>
+                                <div class="relative h-32 sm:h-36 overflow-hidden border-b hairline-border">
+                                    <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=900&q=75" alt="Microgravity Orbital Combustion" class="w-full h-full object-cover">
+                                    <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 text-[10px] font-roman tracking-[0.2em] uppercase border gold-border gold-text font-semibold" style="background-color: var(--bg-solid);">
+                                        01
+                                    </span>
+                                </div>
+                                <div class="p-4 sm:p-5 space-y-2">
+                                    <p class="font-roman text-[10px] tracking-[0.18em] uppercase gold-text">
+                                        NASA Space Apps Challenge
+                                    </p>
+                                    <h3 class="font-broadsheet text-xl sm:text-2xl font-medium group-hover:underline">
+                                        FlameLens
+                                    </h3>
+                                    <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-secondary);">
+                                        AI-Powered Microgravity Fire Safety Engine indexing NASA PSI datasets (<mark class="gold-highlight">BASS, FLEX, ACME</mark>) in SQLite with Gemini AI.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="px-4 sm:px-5 py-3 border-t hairline-border flex items-center justify-between text-[11px] font-roman tracking-[0.16em] uppercase">
+                                <span style="color: var(--text-muted);">Python &bull; SQLite</span>
+                                <span class="gold-text inline-flex items-center gap-1">
+                                    Inspect <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                                </span>
+                            </div>
+                        </article>
+
+                        <!-- 02. DSE Apparel & Supply Pipeline -->
+                        <article onclick="openCaseStudy('dse')" class="editorial-card rounded-sm overflow-hidden flex flex-col justify-between cursor-pointer group">
+                            <div>
+                                <div class="relative h-32 sm:h-36 overflow-hidden border-b hairline-border">
+                                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=75" alt="Cross-Border Freight Logistics" class="w-full h-full object-cover">
+                                    <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 text-[10px] font-roman tracking-[0.2em] uppercase border gold-border gold-text font-semibold" style="background-color: var(--bg-solid);">
+                                        02
+                                    </span>
+                                </div>
+                                <div class="p-4 sm:p-5 space-y-2">
+                                    <p class="font-roman text-[10px] tracking-[0.18em] uppercase gold-text">
+                                        Vector &amp; Logistics Systems
+                                    </p>
+                                    <h3 class="font-broadsheet text-xl sm:text-2xl font-medium group-hover:underline">
+                                        DSE Apparel &amp; Supply Pipeline
+                                    </h3>
+                                    <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-secondary);">
+                                        Cross-border production vectorization, 1688 sourcing, and freight logistics from <mark class="gold-highlight">Guangzhou to Phnom Penh</mark>.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="px-4 sm:px-5 py-3 border-t hairline-border flex items-center justify-between text-[11px] font-roman tracking-[0.16em] uppercase">
+                                <span style="color: var(--text-muted);">Vector &bull; 1688 Ops</span>
+                                <span class="gold-text inline-flex items-center gap-1">
+                                    Inspect <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                                </span>
+                            </div>
+                        </article>
+
+                        <!-- 03. ESP32 Telemetry Node -->
+                        <article onclick="openCaseStudy('esp32')" class="editorial-card rounded-sm overflow-hidden flex flex-col justify-between cursor-pointer group">
+                            <div>
+                                <div class="relative h-32 sm:h-36 overflow-hidden border-b hairline-border">
+                                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=75" alt="Embedded Microcontroller Hardware" class="w-full h-full object-cover">
+                                    <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 text-[10px] font-roman tracking-[0.2em] uppercase border gold-border gold-text font-semibold" style="background-color: var(--bg-solid);">
+                                        03
+                                    </span>
+                                </div>
+                                <div class="p-4 sm:p-5 space-y-2">
+                                    <p class="font-roman text-[10px] tracking-[0.18em] uppercase gold-text">
+                                        Embedded Edge Acquisition
+                                    </p>
+                                    <h3 class="font-broadsheet text-xl sm:text-2xl font-medium group-hover:underline">
+                                        ESP32 Telemetry Node
+                                    </h3>
+                                    <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-secondary);">
+                                        Type-C ESP32 microcontroller node with deterministic GPIO mapping and <mark class="gold-highlight">local SQLite logging</mark>.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="px-4 sm:px-5 py-3 border-t hairline-border flex items-center justify-between text-[11px] font-roman tracking-[0.16em] uppercase">
+                                <span style="color: var(--text-muted);">ESP32 &bull; SQLite</span>
+                                <span class="gold-text inline-flex items-center gap-1">
+                                    Inspect <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                                </span>
+                            </div>
+                        </article>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 SLIDE III: CHRONICLE & CAPABILITIES (Index 3)
+                 ================================================================= -->
+            <section class="slide-panel" data-panel="3">
+                <div class="roman-watermark" data-watermark="3">III</div>
+
+                <div class="max-w-6xl w-full mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-10 items-center">
+                    
+                    <!-- Left Column: Education & Broadsheet Chronicle -->
+                    <div class="lg:col-span-7 space-y-5">
+                        <div class="border-b hairline-border pb-3.5">
+                            <p class="font-roman text-xs tracking-[0.26em] uppercase gold-text font-medium mb-1">
+                                Section III &mdash; Chronicle &amp; Capabilities
+                            </p>
+                            <h2 class="font-broadsheet text-2xl sm:text-4xl font-normal">
+                                Academic Foundation &amp; <mark class="gold-highlight italic">Technical Stack</mark>
+                            </h2>
+                        </div>
+
+                        <p class="drop-cap text-sm sm:text-base leading-relaxed" style="color: var(--text-secondary);">
+                            Pursuing a Bachelor of Science in Data Science &amp; Engineering at the Royal University of Phnom Penh, bridging statistical modeling and relational data engines with hands-on software and microcontroller systems. Completed General English Program Level 12 at the Australian Centre for Education.
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="editorial-card p-4 sm:p-5 rounded-sm space-y-1">
+                                <span class="font-roman text-[10px] tracking-[0.2em] uppercase gold-text">Education I</span>
+                                <h3 class="font-broadsheet text-lg sm:text-xl font-medium">Royal University of Phnom Penh</h3>
+                                <p class="text-xs sm:text-sm" style="color: var(--text-secondary);">
+                                    B.Sc. in Data Science &amp; Engineering
+                                </p>
+                            </div>
+
+                            <div class="editorial-card p-4 sm:p-5 rounded-sm space-y-1">
+                                <span class="font-roman text-[10px] tracking-[0.2em] uppercase gold-text">Education II</span>
+                                <h3 class="font-broadsheet text-lg sm:text-xl font-medium">Australian Centre for Education</h3>
+                                <p class="text-xs sm:text-sm" style="color: var(--text-secondary);">
+                                    General English Program (GEP 12)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Editorial Studio Photograph & Technical Stack Ledger -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="editorial-card p-2.5 rounded-sm">
+                            <div class="relative h-36 sm:h-40 overflow-hidden border hairline-border">
+                                <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1000&q=75" alt="Editorial Academic Architecture" class="w-full h-full object-cover">
+                            </div>
+                            <div class="pt-2 px-1 flex items-center justify-between text-[10px] font-roman tracking-[0.16em] uppercase" style="color: var(--text-muted);">
+                                <span>Fig. II &mdash; Phnom Penh</span>
+                                <span class="gold-text">GMT+7</span>
+                            </div>
+                        </div>
+
+                        <div class="editorial-card p-4 sm:p-5 rounded-sm space-y-2.5">
+                            <h4 class="font-roman text-[11px] tracking-[0.22em] uppercase gold-text">Technical Stack &amp; Instruments</h4>
+                            <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm" style="color: var(--text-secondary);">
+                                <div>&bull; Python &amp; Pandas</div>
+                                <div>&bull; SQLite &amp; SQL</div>
+                                <div>&bull; HTML, CSS &amp; JS</div>
+                                <div>&bull; ESP32 &amp; GPIO</div>
+                                <div>&bull; Git &amp; Version Control</div>
+                                <div>&bull; VS Code &amp; Gemini API</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 SLIDE IV: CORRESPONDENCE & DISPATCH (Index 4)
+                 ================================================================= -->
+            <section class="slide-panel" data-panel="4">
+                <div class="roman-watermark" data-watermark="4">IV</div>
+
+                <div class="max-w-6xl w-full mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <div class="lg:col-span-6 space-y-5">
+                        <p class="font-roman text-xs tracking-[0.26em] uppercase gold-text font-medium">
+                            Section IV &mdash; Correspondence &amp; Dispatch
+                        </p>
+                        <h2 class="font-broadsheet text-3xl sm:text-5xl font-normal leading-tight">
+                            Initiate an <mark class="gold-highlight italic">Editorial Inquiry</mark> or Research Dialogue.
+                        </h2>
+                        <p class="drop-cap text-base sm:text-lg leading-relaxed" style="color: var(--text-secondary);">
+                            Available in Phnom Penh and remotely for data engineering collaborations, scientific dataset indexing, hackathon teams, and applied intelligence systems.
+                        </p>
+
+                        <div class="pt-1 flex flex-wrap items-center gap-6 font-roman text-xs tracking-[0.2em] uppercase">
+                            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 border-b gold-border pb-1 hover:opacity-75">
+                                <span>GitHub</span>
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 gold-text"></i>
+                            </a>
+                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 border-b gold-border pb-1 hover:opacity-75">
+                                <span>LinkedIn</span>
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 gold-text"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-6">
+                        <div class="editorial-card p-6 sm:p-8 rounded-sm space-y-5">
+                            <div class="flex items-center justify-between border-b hairline-border pb-3.5">
+                                <span class="font-roman text-xs tracking-[0.22em] uppercase gold-text">Direct Electronic Telegraph</span>
+                                <span class="text-xs italic" style="color: var(--text-muted);">Phnom Penh &bull; GMT+7</span>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <p class="text-[11px] uppercase font-roman tracking-[0.18em]" style="color: var(--text-muted);">Address</p>
+                                <div class="flex flex-wrap items-center justify-between gap-3">
+                                    <span class="font-broadsheet text-xl sm:text-3xl">bosenghour@example.com</span>
+                                    <button onclick="copyEmailAddress()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm border gold-border font-roman text-[11px] tracking-[0.18em] uppercase hover:opacity-80 cursor-pointer">
+                                        <i data-lucide="copy" class="w-3.5 h-3.5 gold-text"></i>
+                                        <span>Copy</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 flex flex-wrap items-center justify-between gap-4 border-t hairline-border">
+                                <span class="text-xs italic" style="color: var(--text-muted);">
+                                    &copy; 2026 Bo Senghour
+                                </span>
+
+                                <button onclick="stepSlide(1)" class="font-roman text-xs tracking-[0.18em] uppercase gold-text hover:underline cursor-pointer">
+                                    Continue Wheel to Front Page (I) &darr;
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 CLONE OF SLIDE I (Index 5 — Enables Seamless Downward Loop)
+                 ================================================================= -->
+            <section class="slide-panel" data-panel="5" aria-hidden="true">
+                <div class="roman-watermark" data-watermark="5">I</div>
+                <div class="max-w-6xl w-full mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
+                    <div class="lg:col-span-7 space-y-5 order-2 lg:order-1">
+                        <p class="font-roman text-xs tracking-[0.26em] uppercase gold-text font-medium">
+                            Section I &mdash; Data Science &amp; Engineering
+                        </p>
+                        <h2 class="font-broadsheet text-3xl sm:text-5xl lg:text-[3.25rem] font-normal leading-[1.12] tracking-tight">
+                            Engineering <mark class="gold-highlight italic">resilient data pipelines</mark> &amp; applied intelligence.
+                        </h2>
+                        <div class="w-16 h-[1px]" style="background-color: var(--accent-gold);"></div>
+                        <p class="drop-cap text-base sm:text-lg leading-relaxed max-w-xl" style="color: var(--text-secondary);">
+                            Undergraduate scholar in Data Science &amp; Engineering at the Royal University of Phnom Penh. Specializing in scientific combustion datasets, deterministic retrieval architectures, and embedded telemetry.
+                        </p>
+                    </div>
+                    <div class="lg:col-span-5 flex flex-col items-center justify-center order-1 lg:order-2">
+                        <div class="cutout-stage">
+                            <div class="backdrop-monument-text">BO<br>SENG<br>HOUR</div>
+                            <div class="cardboard-3d-wrapper">
+                                <canvas id="cutout-canvas-clone" class="cutout-canvas-el" width="420" height="540"></canvas>
+                            </div>
+                            <div class="cutout-pedestal"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- =====================================================================
+         BOTTOM BROADSHEET PAGINATION BAR, PROGRESS TRACK & PREV/NEXT TRIGGERS
+         ===================================================================== -->
+    <footer class="fixed bottom-0 left-0 right-0 z-40 px-6 sm:px-12 pb-3.5 pt-2 pointer-events-none">
+        <div class="max-w-7xl mx-auto">
+            <!-- Continuous Gold Wheel Progress Track -->
+            <div class="relative w-full h-[2px] mb-2.5 overflow-hidden" style="background-color: var(--border-subtle);">
+                <div id="wheel-progress-bar" class="h-full w-1/4 transition-transform duration-150 ease-out" style="background-color: var(--accent-gold);"></div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 pointer-events-auto">
+                <!-- Previous Slide Trigger -->
+                <button onclick="stepSlide(-1)" class="inline-flex items-center gap-2 font-roman text-xs tracking-[0.2em] uppercase hover:opacity-75 cursor-pointer py-1">
+                    <i data-lucide="arrow-up" class="w-3.5 h-3.5 gold-text"></i>
+                    <span>Prev</span>
+                </button>
+
+                <!-- Roman Numeral Chapter Indicators -->
+                <div class="flex items-center gap-4 sm:gap-7 font-roman text-xs tracking-[0.22em]">
+                    <button onclick="snapToTarget(1)" data-indicator="1" class="chapter-dot cursor-pointer py-1 transition-all gold-text font-bold">I</button>
+                    <span class="opacity-30">&bull;</span>
+                    <button onclick="snapToTarget(2)" data-indicator="2" class="chapter-dot cursor-pointer py-1 transition-all opacity-55 hover:opacity-100">II</button>
+                    <span class="opacity-30">&bull;</span>
+                    <button onclick="snapToTarget(3)" data-indicator="3" class="chapter-dot cursor-pointer py-1 transition-all opacity-55 hover:opacity-100">III</button>
+                    <span class="opacity-30">&bull;</span>
+                    <button onclick="snapToTarget(4)" data-indicator="4" class="chapter-dot cursor-pointer py-1 transition-all opacity-55 hover:opacity-100">IV</button>
+                </div>
+
+                <!-- Next Slide Trigger -->
+                <button onclick="stepSlide(1)" class="inline-flex items-center gap-2 font-roman text-xs tracking-[0.2em] uppercase hover:opacity-75 cursor-pointer py-1">
+                    <span>Next</span>
+                    <i data-lucide="arrow-down" class="w-3.5 h-3.5 gold-text"></i>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- =====================================================================
+         CASE STUDY ARCHIVAL MODAL
+         ===================================================================== -->
+    <div id="case-study-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6">
+        <div onclick="closeCaseStudy()" class="fixed inset-0 bg-black/65 backdrop-blur-xs"></div>
+        <div class="relative z-10 w-full max-w-2xl rounded-sm border hairline-border shadow-2xl overflow-hidden" style="background-color: var(--bg-solid);">
+            <div class="px-6 sm:px-8 py-4 border-b hairline-border flex items-center justify-between">
+                <span id="modal-folio" class="font-roman text-xs tracking-[0.22em] uppercase gold-text font-medium">FOLIO 01</span>
+                <button onclick="closeCaseStudy()" class="p-1.5 hover:opacity-70 cursor-pointer" aria-label="Close Case Study">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 sm:p-8 space-y-5">
+                <div>
+                    <h3 id="modal-title" class="font-broadsheet text-2xl sm:text-3xl font-medium">Project Title</h3>
+                    <p id="modal-subtitle" class="font-roman text-xs tracking-[0.16em] uppercase mt-1" style="color: var(--text-muted);">Subtitle</p>
+                </div>
+                <div class="w-12 h-[1px]" style="background-color: var(--accent-gold);"></div>
+                <p id="modal-description" class="text-sm sm:text-base leading-relaxed" style="color: var(--text-secondary);"></p>
+                <div class="space-y-2 pt-1">
+                    <h4 class="font-roman text-xs tracking-[0.2em] uppercase" style="color: var(--text-muted);">Architectural Breakdown</h4>
+                    <ul id="modal-bullets" class="space-y-2 text-sm" style="color: var(--text-primary);"></ul>
+                </div>
+                <div class="pt-4 border-t hairline-border flex flex-wrap items-center justify-between gap-4">
+                    <span id="modal-tech" class="font-roman text-xs tracking-[0.15em] uppercase" style="color: var(--text-muted);"></span>
+                    <button onclick="closeCaseStudy()" class="font-roman text-xs tracking-[0.2em] uppercase border-b gold-border pb-0.5 cursor-pointer">
+                        Close Dossier
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editorial Toast Notification -->
+    <div id="editorial-toast" class="fixed bottom-16 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-700 pointer-events-none">
+        <div class="px-4 py-2.5 rounded-sm border gold-border shadow-lg flex items-center gap-2.5 text-xs font-roman tracking-[0.15em] uppercase" style="background-color: var(--bg-solid);">
+            <i data-lucide="check" class="w-3.5 h-3.5 gold-text"></i>
+            <span id="toast-message">Copied to Clipboard</span>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        /* =====================================================================
+           1. FREE-FLOWING VELOCITY-BASED INERTIAL WHEEL ENGINE (NON-FORCING)
+           ===================================================================== */
+        const track = document.getElementById('carousel-track');
+        const viewport = document.getElementById('carousel-viewport');
+        const progressBar = document.getElementById('wheel-progress-bar');
+        const slidePanels = document.querySelectorAll('.slide-panel');
+        const watermarks = document.querySelectorAll('.roman-watermark');
+
+        // Slide coordinates:
+        // 0 = Clone IV, 1 = Real I, 2 = Real II, 3 = Real III, 4 = Real IV, 5 = Clone I
+        let currentPos = 1.0;
+        let velocity = 0.0;
+        let autoGlideTarget = null; // Used ONLY when user explicitly clicks a nav button; cancelled on any manual scroll/drag
+        let isDragging = false;
+        let dragLastY = 0;
+        let dragLastTime = 0;
+        let lastFrameTime = performance.now();
+        let lastActiveLogical = 1;
+
+        function isModalOpen() {
+            return !document.getElementById('case-study-modal').classList.contains('hidden');
+        }
+
+        function snapToTarget(index) {
+            velocity = 0;
+            autoGlideTarget = index;
+        }
+
+        function stepSlide(delta) {
+            velocity = 0;
+            const base = autoGlideTarget !== null ? autoGlideTarget : Math.round(currentPos);
+            autoGlideTarget = base + delta;
+        }
+
+        // Normalize wheel deltas across mouse wheels (lines), trackpads (pixels), and page scrolls
+        function normalizeWheelDelta(e) {
+            const raw = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+            if (e.deltaMode === 1) return raw * 32; // Line mode -> px
+            if (e.deltaMode === 2) return raw * window.innerHeight; // Page mode -> px
+            return raw;
+        }
+
+        // Free-flowing Mouse Wheel & Trackpad Impulse (No Forced Snapping)
+        window.addEventListener('wheel', (e) => {
+            if (isModalOpen()) return;
+            e.preventDefault();
+
+            // Immediately yield any button-triggered glide back to manual control
+            autoGlideTarget = null;
+
+            const pxDelta = normalizeWheelDelta(e);
+            // Gentle, silk-smooth impulse capped so trackpad flicks glide gracefully without jumping wildly
+            const impulse = Math.max(-0.022, Math.min(0.022, pxDelta * 0.000115));
+            velocity += impulse;
+            velocity = Math.max(-0.065, Math.min(0.065, velocity));
+        }, { passive: false });
+
+        // 1:1 Pointer / Touch Dragging with Natural Release Momentum
+        viewport.addEventListener('pointerdown', (e) => {
+            if (isModalOpen() || e.target.closest('button, a, input, label, article, [role="button"], #theme-toggle, #case-study-modal')) return;
+            isDragging = true;
+            autoGlideTarget = null;
+            velocity = 0;
+            dragLastY = e.clientY;
+            dragLastTime = performance.now();
+            viewport.classList.add('is-dragging');
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            const now = performance.now();
+            const dy = dragLastY - e.clientY;
+            const dt = Math.max(8, now - dragLastTime);
+
+            // 1:1 direct displacement in viewport heights
+            const posDelta = dy / window.innerHeight;
+            currentPos += posDelta;
+
+            // Track instantaneous release velocity scaled to a 16.67ms frame
+            const instantVel = (posDelta / dt) * 16.67;
+            velocity = velocity * 0.35 + instantVel * 0.65;
+
+            dragLastY = e.clientY;
+            dragLastTime = now;
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            viewport.classList.remove('is-dragging');
+            // Clamp release momentum gently so coasting feels natural and effortless
+            velocity = Math.max(-0.055, Math.min(0.055, velocity));
+        });
+
+        window.addEventListener('pointercancel', () => {
+            isDragging = false;
+            viewport.classList.remove('is-dragging');
+        });
+
+        // Keyboard Up / Down & Left / Right Navigation
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCaseStudy();
+                return;
+            }
+            if (isModalOpen()) return;
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') stepSlide(1);
+            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') stepSlide(-1);
+        });
+
+        // Main Delta-Time Inertial Physics Loop (Silk-Smooth, Zero Forced Snap)
+        function animateWheelLoop(now) {
+            const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+            lastFrameTime = now;
+            const frameFactor = dt * 60;
+
+            if (!isDragging) {
+                if (autoGlideTarget !== null) {
+                    // Critically-damped smooth glide for explicit chapter button clicks
+                    const diff = autoGlideTarget - currentPos;
+                    currentPos += diff * (1 - Math.pow(0.91, frameFactor));
+                    if (Math.abs(diff) < 0.0008) {
+                        currentPos = autoGlideTarget;
+                        autoGlideTarget = null;
+                    }
+                } else if (Math.abs(velocity) > 0.00001) {
+                    // Pure velocity coasting with silky exponential friction (stops freely anywhere)
+                    currentPos += velocity * frameFactor;
+                    velocity *= Math.pow(0.925, frameFactor);
+                    if (Math.abs(velocity) < 0.00001) {
+                        velocity = 0;
+                    }
+                }
+            }
+
+            // Seamless Infinite Loop Wrap across [0.5 .. 4.5] boundary
+            if (currentPos >= 4.5) {
+                currentPos -= 4.0;
+                if (autoGlideTarget !== null) autoGlideTarget -= 4.0;
+            } else if (currentPos < 0.5) {
+                currentPos += 4.0;
+                if (autoGlideTarget !== null) autoGlideTarget += 4.0;
+            }
+
+            // Apply vertical translation to track
+            track.style.transform = `translate3d(0, ${-currentPos * 100}vh, 0)`;
+
+            // Subtle velocity-linked depth breath & vertical parallax on Roman watermarks
+            const effectiveVel = autoGlideTarget !== null
+                ? (autoGlideTarget - currentPos) * 0.06
+                : velocity;
+            const clampedVel = Math.max(-0.08, Math.min(0.08, effectiveVel));
+
+            slidePanels.forEach((panel, idx) => {
+                const dist = idx - currentPos;
+                if (Math.abs(dist) <= 1.5) {
+                    const scale = 1 - Math.min(0.018, Math.abs(clampedVel) * 0.22);
+                    panel.style.transform = `scale(${scale.toFixed(4)})`;
+                }
+            });
+
+            watermarks.forEach((wm, idx) => {
+                const dist = idx - currentPos;
+                if (Math.abs(dist) <= 1.5) {
+                    wm.style.transform = `translate3d(0, ${dist * 85}px, 0)`;
+                }
+            });
+
+            // Update continuous bottom gold progress bar (maps 1..5 -> 0%..300% of 25% bar)
+            let normalizedLoop = ((currentPos - 1) % 4 + 4) % 4; // 0.0 to 4.0
+            if (progressBar) {
+                progressBar.style.transform = `translateX(${normalizedLoop * 100}%)`;
+            }
+
+            // Determine nearest chapter (1..4) for indicators & soft background crossfade
+            let logicalSlide = Math.round(currentPos);
+            if (logicalSlide <= 0) logicalSlide += 4;
+            if (logicalSlide >= 5) logicalSlide -= 4;
+
+            if (logicalSlide !== lastActiveLogical) {
+                lastActiveLogical = logicalSlide;
+                updateChapterIndicators(logicalSlide);
+            }
+
+            requestAnimationFrame(animateWheelLoop);
+        }
+
+        function updateChapterIndicators(activeSlide) {
+            document.querySelectorAll('.chapter-dot').forEach(btn => {
+                const idx = parseInt(btn.dataset.indicator, 10);
+                if (idx === activeSlide) {
+                    btn.classList.add('gold-text', 'font-bold');
+                    btn.classList.remove('opacity-55');
+                } else {
+                    btn.classList.remove('gold-text', 'font-bold');
+                    btn.classList.add('opacity-55');
+                }
+            });
+
+            for (let i = 0; i < 4; i++) {
+                const layer = document.getElementById(`bg-photo-${i}`);
+                if (layer) {
+                    if (i === activeSlide - 1) {
+                        layer.classList.add('active');
+                    } else {
+                        layer.classList.remove('active');
+                    }
+                }
+            }
+        }
+
+        requestAnimationFrame(animateWheelLoop);
+
+        /* =====================================================================
+           2. 3D CARDBOARD DIE-CUT PORTRAIT ENGINE (CANVAS BACKGROUND REMOVAL)
+           ===================================================================== */
+        const mainCanvas = document.getElementById('cutout-canvas');
+        const cloneCanvas = document.getElementById('cutout-canvas-clone');
+
+        function renderCardboardCutout(img) {
+            const targetW = 420;
+            const targetH = 540;
+
+            [mainCanvas, cloneCanvas].forEach(canvas => {
+                if (!canvas) return;
+                canvas.width = targetW;
+                canvas.height = targetH;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, targetW, targetH);
+
+                // Fit portrait proportionally inside canvas with margin for die-cut border
+                const pad = 22;
+                const availW = targetW - pad * 2;
+                const availH = targetH - pad;
+                const scale = Math.min(availW / img.width, availH / img.height);
+                const drawW = img.width * scale;
+                const drawH = img.height * scale;
+                const offsetX = (targetW - drawW) / 2;
+                const offsetY = targetH - drawH;
+
+                // Offscreen mask canvas to key out outer white studio background
+                const maskCanvas = document.createElement('canvas');
+                maskCanvas.width = targetW;
+                maskCanvas.height = targetH;
+                const mCtx = maskCanvas.getContext('2d');
+                mCtx.drawImage(img, offsetX, offsetY, drawW, drawH);
+
+                try {
+                    const imgData = mCtx.getImageData(0, 0, targetW, targetH);
+                    const data = imgData.data;
+
+                    // Flood-fill from outer top, left, and right edges so white shirt collar stays intact
+                    const visited = new Uint8Array(targetW * targetH);
+                    const queue = new Int32Array(targetW * targetH);
+                    let head = 0, tail = 0;
+
+                    function isNearWhite(idx) {
+                        const r = data[idx];
+                        const g = data[idx + 1];
+                        const b = data[idx + 2];
+                        return r > 224 && g > 224 && b > 224 && Math.abs(r - g) < 18 && Math.abs(g - b) < 18;
+                    }
+
+                    for (let x = 0; x < targetW; x++) {
+                        if (isNearWhite(x * 4)) {
+                            visited[x] = 1;
+                            queue[tail++] = x;
+                        }
+                    }
+                    for (let y = 0; y < targetH; y++) {
+                        const leftIdx = y * targetW;
+                        const rightIdx = y * targetW + (targetW - 1);
+                        if (!visited[leftIdx] && isNearWhite(leftIdx * 4)) {
+                            visited[leftIdx] = 1;
+                            queue[tail++] = leftIdx;
+                        }
+                        if (!visited[rightIdx] && isNearWhite(rightIdx * 4)) {
+                            visited[rightIdx] = 1;
+                            queue[tail++] = rightIdx;
+                        }
+                    }
+
+                    while (head < tail) {
+                        const curr = queue[head++];
+                        const cx = curr % targetW;
+                        const cy = (curr - cx) / targetW;
+                        data[curr * 4 + 3] = 0;
+
+                        const neighbors = [
+                            cx > 0 ? curr - 1 : -1,
+                            cx < targetW - 1 ? curr + 1 : -1,
+                            cy > 0 ? curr - targetW : -1,
+                            cy < targetH - 1 ? curr + targetW : -1
+                        ];
+
+                        for (let n = 0; n < 4; n++) {
+                            const next = neighbors[n];
+                            if (next !== -1 && !visited[next]) {
+                                visited[next] = 1;
+                                if (isNearWhite(next * 4)) {
+                                    queue[tail++] = next;
+                                } else {
+                                    const p = next * 4;
+                                    const lum = (data[p] + data[p + 1] + data[p + 2]) / 3;
+                                    if (lum > 205) {
+                                        data[p + 3] = Math.max(0, Math.min(255, (245 - lum) * 6));
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    mCtx.putImageData(imgData, 0, 0);
+                } catch (err) {
+                    // Graceful fallback if cross-origin canvas is tainted
+                }
+
+                // Create crisp white cardboard die-cut rim around silhouette
+                const rimCanvas = document.createElement('canvas');
+                rimCanvas.width = targetW;
+                rimCanvas.height = targetH;
+                const rCtx = rimCanvas.getContext('2d');
+                rCtx.drawImage(maskCanvas, 0, 0);
+                rCtx.globalCompositeOperation = 'source-in';
+                rCtx.fillStyle = '#FFFFFF';
+                rCtx.fillRect(0, 0, targetW, targetH);
+
+                const borderThickness = 9;
+                for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 12) {
+                    const dx = Math.cos(angle) * borderThickness;
+                    const dy = Math.sin(angle) * borderThickness;
+                    ctx.drawImage(rimCanvas, dx, dy);
+                }
+
+                // Composite keyed portrait cleanly atop cardboard backing
+                ctx.drawImage(maskCanvas, 0, 0);
+            });
+        }
+
+        function initPortraitCutout() {
+            const sourcePaths = ['Canva - download.jpg', './Canva - download.jpg'];
+            let attempt = 0;
+
+            function tryNext() {
+                if (attempt >= sourcePaths.length) {
+                    const fallbackImg = new Image();
+                    fallbackImg.crossOrigin = 'anonymous';
+                    fallbackImg.onload = () => renderCardboardCutout(fallbackImg);
+                    fallbackImg.src = 'https://placehold.co/600x760/FFFFFF/18181B?text=Bo+Senghour';
+                    return;
+                }
+                const img = new Image();
+                img.onload = () => renderCardboardCutout(img);
+                img.onerror = () => {
+                    attempt++;
+                    tryNext();
+                };
+                img.src = sourcePaths[attempt];
+            }
+
+            tryNext();
+        }
+
+        function handlePortraitUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    renderCardboardCutout(img);
+                    showToast('3D Cardboard Portrait Updated');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Interactive 3D Cursor Tilt & Shadow Depth on Portrait Cutout Stage
+        const cutoutStage = document.getElementById('cutout-stage');
+        const cardboard3d = document.getElementById('cardboard-3d');
+        const backdropText = document.getElementById('backdrop-text');
+
+        if (cutoutStage && cardboard3d) {
+            cutoutStage.addEventListener('mousemove', (e) => {
+                const rect = cutoutStage.getBoundingClientRect();
+                const normX = (e.clientX - rect.left) / rect.width - 0.5;
+                const normY = (e.clientY - rect.top) / rect.height - 0.5;
+
+                cardboard3d.style.animation = 'none';
+                cardboard3d.style.transform = `rotateY(${normX * 18}deg) rotateX(${-normY * 14}deg) translateZ(20px)`;
+                if (backdropText) {
+                    backdropText.style.transform = `translate3d(${-normX * 18}px, ${-normY * 14}px, -30px)`;
+                }
+            });
+
+            cutoutStage.addEventListener('mouseleave', () => {
+                cardboard3d.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0px)';
+                if (backdropText) {
+                    backdropText.style.transform = 'translate3d(0, 0, 0)';
+                }
+                setTimeout(() => {
+                    cardboard3d.style.animation = 'gentleFloat 7.5s ease-in-out infinite';
+                }, 700);
+            });
+        }
+
+        initPortraitCutout();
+
+        /* =====================================================================
+           3. THEME TOGGLE (ALABASTER WHITE <-> MATTE OBSIDIAN BLACK)
+           ===================================================================== */
+        function applyTheme(mode) {
+            const html = document.documentElement;
+            const moon = document.getElementById('icon-moon');
+            const sun = document.getElementById('icon-sun');
+            const label = document.getElementById('theme-label');
+
+            html.setAttribute('data-theme', mode);
+
+            if (mode === 'dark') {
+                html.classList.add('dark');
+                if (moon) moon.classList.add('hidden');
+                if (sun) sun.classList.remove('hidden');
+                if (label) label.textContent = 'Alabaster';
+            } else {
+                html.classList.remove('dark');
+                if (sun) sun.classList.add('hidden');
+                if (moon) moon.classList.remove('hidden');
+                if (label) label.textContent = 'Obsidian';
+            }
+        }
+
+        function toggleTheme(e) {
+            if (e) e.stopPropagation();
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme') || (html.classList.contains('dark') ? 'dark' : 'light');
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            try {
+                localStorage.setItem('bosenghour_chronicle_theme', nextTheme);
+            } catch (err) {}
+        }
+
+        try {
+            const saved = localStorage.getItem('bosenghour_chronicle_theme') || 'light';
+            applyTheme(saved);
+        } catch (e) {
+            applyTheme('light');
+        }
+
+        /* =====================================================================
+           4. CASE STUDY ARCHIVAL MODAL & CLIPBOARD HELPERS
+           ===================================================================== */
+        const dossiers = {
+            flamelens: {
+                folio: 'FOLIO 01  •  NASA SPACE APPS CHALLENGE',
+                title: 'FlameLens',
+                subtitle: 'AI-Powered Microgravity Fire Safety Engine',
+                description: 'In microgravity habitats, the absence of buoyant convection fundamentally alters flame spread and ignition behavior. FlameLens indexes experimental records from NASA’s Physical Sciences Informatics (PSI) datasets—spanning BASS, FLEX, and ACME—into a relational SQLite engine paired with Gemini AI synthesis for verifiable lunar habitat safety evaluations.',
+                bullets: [
+                    'Normalized multi-experiment NASA PSI datasets (BASS, FLEX, ACME) into structured local SQLite tables.',
+                    'Engineered deterministic parameter retrieval so Gemini AI hazard assessments cite verifiable experimental ignition metrics.',
+                    'Designed for local offline execution and rapid scientific cross-referencing.'
+                ],
+                tech: 'Python  •  SQLite  •  NASA PSI Datasets  •  Gemini AI'
+            },
+            dse: {
+                folio: 'FOLIO 02  •  CROSS-BORDER PRODUCTION & VECTOR SYSTEMS',
+                title: 'DSE Apparel & Supply Pipeline',
+                subtitle: 'Royal University of Phnom Penh — Cohort Operations',
+                description: 'Directed end-to-end technical apparel vectorization, 1688 supplier coordination, cohort sizing validation, and cross-border freight logistics from Guangzhou manufacturing partners to Phnom Penh campus delivery.',
+                bullets: [
+                    'Authored print-ready vector schematics and embroidery placement tolerances.',
+                    'Validated cohort order datasets to eliminate sizing discrepancies across bulk production.',
+                    'Managed supplier verification and Guangzhou-to-Phnom Penh freight milestones.'
+                ],
+                tech: 'Vector Systems  •  1688 Sourcing  •  Cross-Border Logistics'
+            },
+            esp32: {
+                folio: 'FOLIO 03  •  EMBEDDED EDGE DATA ACQUISITION',
+                title: 'ESP32 Telemetry Node',
+                subtitle: 'Hardware-to-Database Edge Logging Prototype',
+                description: 'An embedded edge acquisition prototype built on the Type-C ESP32 platform for deterministic GPIO sensor mapping, structured serial telemetry framing, and automated ingestion into local SQLite storage.',
+                bullets: [
+                    'Mapped multi-channel GPIO sensor interfaces with deterministic polling intervals.',
+                    'Implemented structured packet framing for direct ingestion into local SQLite time-series tables.',
+                    'Validated signal stability and serial throughput under continuous bench operation.'
+                ],
+                tech: 'Type-C ESP32  •  GPIO Mapping  •  SQLite Logging'
+            }
+        };
+
+        function openCaseStudy(id) {
+            const data = dossiers[id];
+            if (!data) return;
+            document.getElementById('modal-folio').textContent = data.folio;
+            document.getElementById('modal-title').textContent = data.title;
+            document.getElementById('modal-subtitle').textContent = data.subtitle;
+            document.getElementById('modal-description').textContent = data.description;
+            document.getElementById('modal-tech').textContent = data.tech;
+            document.getElementById('modal-bullets').innerHTML = data.bullets
+                .map(b => `<li class="flex items-start gap-2.5"><span class="gold-text">&mdash;</span><span>${b}</span></li>`)
+                .join('');
+
+            const modal = document.getElementById('case-study-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCaseStudy() {
+            const modal = document.getElementById('case-study-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function copyEmailAddress() {
+            const email = 'bosenghour@example.com';
+            const temp = document.createElement('input');
+            temp.value = email;
+            document.body.appendChild(temp);
+            temp.select();
+            try {
+                document.execCommand('copy');
+                showToast('Copied ' + email);
+            } catch (err) {
+                showToast(email);
+            }
+            document.body.removeChild(temp);
+        }
+
+        let toastTimeout;
+        function showToast(msg) {
+            const toast = document.getElementById('editorial-toast');
+            document.getElementById('toast-message').textContent = msg;
+            toast.classList.remove('translate-y-12', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-12', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
